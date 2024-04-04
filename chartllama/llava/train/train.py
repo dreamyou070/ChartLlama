@@ -47,12 +47,14 @@ def rank0_print(*args):
 
 @dataclass
 class ModelArguments:
+    # check model name or path
     model_name_or_path: Optional[str] = field(default="facebook/opt-125m")
+
     version: Optional[str] = field(default="v0")
     freeze_backbone: bool = field(default=False)
     tune_mm_mlp_adapter: bool = field(default=False)
     lora_further_tune_finetuned: bool = field(default=False)
-    vision_tower: Optional[str] = field(default=None)
+    vision_tower: Optional[str] = field(default=None)           # default = None
     mm_vision_select_layer: Optional[int] = field(default=-1)   # default to the last layer
     pretrain_mm_mlp_adapter: Optional[str] = field(default=None)
     mm_projector_type: Optional[str] = field(default='linear')
@@ -79,25 +81,17 @@ class TrainingArguments(transformers.TrainingArguments):
     remove_unused_columns: bool = field(default=False)
     freeze_mm_mlp_adapter: bool = field(default=False)
     mpt_attn_impl: Optional[str] = field(default="triton")
-    model_max_length: int = field(
-        default=512,
-        metadata={
-            "help":
-            "Maximum sequence length. Sequences will be right padded (and possibly truncated)."
-        },
-    )
-    double_quant: bool = field(
-        default=True,
-        metadata={"help": "Compress the quantization statistics through double quantization."}
-    )
+    model_max_length: int = field(default=512,
+                                  metadata={"help":
+            "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},)
+    double_quant: bool = field(default=True,
+        metadata={"help": "Compress the quantization statistics through double quantization."})
     quant_type: str = field(
         default="nf4",
-        metadata={"help": "Quantization data type to use. Should be one of `fp4` or `nf4`."}
-    )
+        metadata={"help": "Quantization data type to use. Should be one of `fp4` or `nf4`."})
     bits: int = field(
         default=16,
-        metadata={"help": "How many bits to use."}
-    )
+        metadata={"help": "How many bits to use."})
     lora_enable: bool = False
     lora_r: int = 64
     lora_alpha: int = 16
@@ -758,12 +752,17 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
 def train():
     global local_rank
 
-    parser = transformers.HfArgumentParser(
-        (ModelArguments, DataArguments, TrainingArguments))
+    parser = transformers.HfArgumentParser((ModelArguments,
+                                            DataArguments,
+                                            TrainingArguments))
+
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    # [1] local rank
     local_rank = training_args.local_rank
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
 
+    # [2] model
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
     bnb_model_from_pretrained_args = {}
     if training_args.bits in [4, 8]:
@@ -780,41 +779,40 @@ def train():
                 bnb_4bit_compute_dtype=compute_dtype,
                 bnb_4bit_use_double_quant=training_args.double_quant,
                 bnb_4bit_quant_type=training_args.quant_type # {'fp4', 'nf4'}
-            )
-        ))
+            )))
 
     if model_args.vision_tower is not None:
+
         if 'mpt' in model_args.model_name_or_path:
             config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             config.attn_config['attn_impl'] = training_args.mpt_attn_impl
+
             model = LlavaMPTForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
-                **bnb_model_from_pretrained_args
-            )
+                **bnb_model_from_pretrained_args)
         else:
-            model = LlavaLlamaForCausalLM.from_pretrained(
-                model_args.model_name_or_path,
-                cache_dir=training_args.cache_dir,
-                **bnb_model_from_pretrained_args
-            )
-    else:
-        model = transformers.LlamaForCausalLM.from_pretrained(
-            model_args.model_name_or_path,
-            cache_dir=training_args.cache_dir,
-            **bnb_model_from_pretrained_args
-        )
-    model.config.use_cache = False
+            # Llava Llama For Causal LM
+            model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path, # model_name_or_path = facebook/opt-125m
+                                                          cache_dir=training_args.cache_dir,
+                                                          **bnb_model_from_pretrained_args)
 
+    else:
+        # Llama For Causal LM
+        model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                              cache_dir=training_args.cache_dir,
+                                                              **bnb_model_from_pretrained_args)
+    model.config.use_cache = False
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
-
+    # ----------------------------------------------------------------------------------------------------------------------------------------------
+    # [3] training_args
     if training_args.bits in [4, 8]:
         from peft import prepare_model_for_kbit_training
         model.config.torch_dtype=(torch.float32 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
-        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=training_args.gradient_checkpointing)
-
+        model = prepare_model_for_kbit_training(model,
+                                                use_gradient_checkpointing=training_args.gradient_checkpointing)
     if training_args.gradient_checkpointing:
         if hasattr(model, "enable_input_require_grads"):
             model.enable_input_require_grads()
@@ -823,6 +821,7 @@ def train():
                 output.requires_grad_(True)
             model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
 
+    # ----------------------------------------------------------------------------------------------------------------------------------------------
     if training_args.lora_enable:
         from peft import LoraConfig, get_peft_model
         lora_config = LoraConfig(
