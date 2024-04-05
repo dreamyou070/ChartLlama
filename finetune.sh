@@ -3,7 +3,7 @@
 # IMPORTANT: this is the training script for the original LLaVA, NOT FOR LLaVA V1.5!
 
 # Uncomment and set the following variables correspondingly to run this script:
-
+# --deepspeed ./scripts/zero2.json \
 ################## VICUNA ##################
 # PROMPT_VERSION=v1
 # MODEL_VERSION="vicuna-v1-3-7b"
@@ -14,8 +14,7 @@ PROMPT_VERSION="llava_llama_2"
 MODEL_VERSION="llama-2-7b-chat"
 ################## LLaMA-2 ##################
 
-deepspeed llava/train/train_mem.py \
-    --deepspeed ./scripts/zero2.json \
+python llava/train/train_mem.py \
     --model_name_or_path "/share0/dreamyou070/dreamyou070/pretrained_model/${MODEL_VERSION}" \
     --version $PROMPT_VERSION \
     --data_path ./playground/data/llava_instruct_80k.json \
