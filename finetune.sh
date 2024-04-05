@@ -14,7 +14,7 @@ PROMPT_VERSION="llava_llama_2"
 MODEL_VERSION="llama-2-7b-chat"
 ################## LLaMA-2 ##################
 
-python llava/train/train_mem.py \
+python ChartLlama-code/llava/train/train_mem.py \
     --model_name_or_path "/share0/dreamyou070/dreamyou070/pretrained_model/${MODEL_VERSION}" \
     --version $PROMPT_VERSION \
     --data_path ./playground/data/llava_instruct_80k.json \
