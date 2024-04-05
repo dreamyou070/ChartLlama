@@ -756,14 +756,20 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
 
 
 def train():
-    global local_rank
 
-    parser = transformers.HfArgumentParser(
-        (ModelArguments, DataArguments, TrainingArguments))
+    print(f' step 1. argument checking')
+
+    parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    print(f' step 2. rank (multi gpu)')
+    global local_rank
     local_rank = training_args.local_rank
+
+    print(f' step 3. dtype')
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
 
+    """
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
     bnb_model_from_pretrained_args = {}
     if training_args.bits in [4, 8]:
@@ -956,6 +962,6 @@ def train():
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
 
-
+    """
 if __name__ == "__main__":
     train()
