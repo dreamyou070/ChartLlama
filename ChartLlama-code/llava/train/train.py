@@ -854,7 +854,6 @@ def train():
     elif model_args.version == "v0.5": tokenizer.pad_token = tokenizer.unk_token
     else : # llava_llama_2
         tokenizer.pad_token = tokenizer.unk_token
-        print(f'conversation_lib.conv_templates : {conversation_lib.conv_templates}')
         if model_args.version in conversation_lib.conv_templates:
             conversation_lib.default_conversation = conversation_lib.conv_templates[model_args.version]
         else:
@@ -863,8 +862,24 @@ def train():
     print(f' step 7. vision tower')
     if model_args.vision_tower is not None:
         print(f' (7.0) initialize vision model with openai model')
-        model.get_model().initialize_vision_modules(model_args=model_args, fsdp=training_args.fsdp)
+        # initialize with openai model
+        # "0.bias", "0.weight", "2.bias", "2.weight"
+        model.get_model().initialize_vision_modules(model_args=model_args,
+                                                    fsdp=training_args.fsdp)
         vision_tower = model.get_vision_tower()
+
+
+
+
+
+
+
+
+
+
+
+
+
         vision_tower.to(dtype=torch.bfloat16 if training_args.bf16 else torch.float16, device=training_args.device)
         print(f' (7.1) change data_argument')
         data_args.image_processor = vision_tower.image_processor
@@ -914,7 +929,7 @@ def train():
 
     print(f'\n step 9. Trainer')
     trainer = LLaVATrainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
-    
+
     """
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)

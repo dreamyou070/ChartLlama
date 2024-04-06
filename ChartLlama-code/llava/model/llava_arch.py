@@ -60,14 +60,24 @@ class LlavaMetaModel:
         self.config.mm_vision_select_layer = mm_vision_select_layer
         self.config.mm_vision_select_feature = mm_vision_select_feature
 
+        # self.config
         if not model_args.lora_further_tune_finetuned:
+            # --------------------------------------------------------------------------------------------------------
+            # vision projector
             self.mm_projector = build_vision_projector(self.config)
         else:
             print("###########use pretrained mm_projector")
 
+        print(f'self.mm_projector = {self.mm_projector}')
+
+        # [2] pretrained mm mlp adapter
+        print(f'pretrain_mm_mlp_adapter = {pretrain_mm_mlp_adapter}')
         if pretrain_mm_mlp_adapter is not None:
+            # Load pretrained mm_projector
             mm_projector_weights = torch.load(pretrain_mm_mlp_adapter, map_location='cpu')
-            def get_w(weights, keyword):
+            def get_w(weights, keyword): # keyword = 'mm_projector'
+                # if mm_projector in key name,
+                # make new name = key name without 'mm_projector'
                 return {k.split(keyword + '.')[1]: v for k, v in weights.items() if keyword in k}
 
             self.mm_projector.load_state_dict(get_w(mm_projector_weights, 'mm_projector'))
