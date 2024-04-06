@@ -758,8 +758,8 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
 def train():
 
     print(f' step 1. argument checking')
-
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
+    # parsing arguments
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     print(f' step 2. rank (multi gpu)')
