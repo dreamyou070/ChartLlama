@@ -20,7 +20,7 @@ MODEL_VERSION="llama-2-7b-chat"
 python ChartLlama-code/llava/train/train_mem.py \
     --model_name_or_path "/share0/dreamyou070/dreamyou070/pretrained_model/${MODEL_VERSION}" \
     --version $PROMPT_VERSION \
-    --data_path ./playground/data/llava_instruct_80k.json \
+    --data_path ./ChartLlama-code/playground/data/llava_instruct_80k.json \
     --image_folder ./data/coco/train2017 \
     --vision_tower openai/clip-vit-large-patch14 \
     --pretrain_mm_mlp_adapter "./ChartLlama-code/checkpoints/llava-${MODEL_VERSION}/mm_projector.bin" \
@@ -29,8 +29,8 @@ python ChartLlama-code/llava/train/train_mem.py \
     --mm_use_im_patch_token False \
     --output_dir ./checkpoints/llava-$MODEL_VERSION-finetune \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 16 \
-    --per_device_eval_batch_size 4 \
+    --per_device_train_batch_size 1 \
+    --per_device_eval_batch_size 1 \
     --gradient_accumulation_steps 1 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
