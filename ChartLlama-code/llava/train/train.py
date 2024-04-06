@@ -754,19 +754,19 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
 
 def train():
 
-    print(f' step 1. argument checking')
+    print(f'\n step 1. argument checking')
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     # parsing arguments
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    print(f' step 2. rank (multi gpu)')
+    print(f'\n step 2. rank (multi gpu)')
     global local_rank
     local_rank = training_args.local_rank
 
-    print(f' step 3. dtype (float32) ')
+    print(f'\n step 3. dtype (float32) ')
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
 
-    print(f' step 4. model')
+    print(f'\n step 4. model')
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
     print(f' (4.0) training argument (present bits = 16) ')
     bnb_model_from_pretrained_args = {}
@@ -782,55 +782,57 @@ def train():
                                                                                           bnb_4bit_compute_dtype=compute_dtype,
                                                                                           bnb_4bit_use_double_quant=training_args.double_quant,
                                                                                           bnb_4bit_quant_type=training_args.quant_type)))
-    print(f' (4.1) Language Model')
-    print(f' model_args.vision_tower = {model_args.vision_tower}')
+    print(f' (4.1) backbone model (LLama)')
     if model_args.vision_tower is not None:
-        if 'mpt' in model_args.model_name_or_path:
+        if 'mpt' in model_args.model_name_or_path :
+            # MPT models are GPT-style decoder-only transformers with several improvements
+            # language model
             config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             config.attn_config['attn_impl'] = training_args.mpt_attn_impl
-            model = LlavaMPTForCausalLM.from_pretrained(model_args.model_name_or_path,
-                                                        config=config,
-                                                        cache_dir=training_args.cache_dir,
-                                                        **bnb_model_from_pretrained_args)
+            model = LlavaMPTForCausalLM.from_pretrained(model_args.model_name_or_path, config=config, cache_dir=training_args.cache_dir, **bnb_model_from_pretrained_args)
         else:
-            # ---------------------------------------------------------------------------------------------------------------------------------------
-            # Loading Vision Tower
-            # model_name_or_path = model_name_or_path = openai/
-            print(f'language model pretrained model name = Chat')
+            # model_name_or_path = model_name_or_path = Llama
+            print(f' training_args.cache_dir = {training_args.cache_dir}')
+            # different from trnasformer LlamaForCausalLM, have head model
             model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
-                                                          cache_dir=training_args.cache_dir,
-                                                          **bnb_model_from_pretrained_args)
+                                                          cache_dir=training_args.cache_dir, **bnb_model_from_pretrained_args)
     else:
-        model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
-                                                              cache_dir=training_args.cache_dir,
-                                                              **bnb_model_from_pretrained_args)
+        # if without vision model, use only transformer Language Model
+        model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path, cache_dir=training_args.cache_dir, **bnb_model_from_pretrained_args)
 
     print(f' (4.3) backbone')
     model.config.use_cache = False
+    print(f'LLM config = {model.config}')
+    print(f'model_args freeze? = {model_args.freeze_backbone}')
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
-    if training_args.bits in [4, 8]:
+    if training_args.bits in [4, 8] :
+        # change bit of the model
         from peft import prepare_model_for_kbit_training
         model.config.torch_dtype=(torch.float32 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=training_args.gradient_checkpointing)
+
+    print(f' when training, gradient checkpoint? = {training_args.gradient_checkpointing}')
     if training_args.gradient_checkpointing:
         if hasattr(model, "enable_input_require_grads"):
             model.enable_input_require_grads()
         else:
             def make_inputs_require_grad(module, input, output):
                 output.requires_grad_(True)
+            # model token embedding gradient checking
             model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
 
     print(f' step 5. lora training ?')
+    print(f' training_args.lora_enable = {training_args.lora_enable}')
     if training_args.lora_enable:
+        # no training lora
         from peft import LoraConfig, get_peft_model
         lora_config = LoraConfig(r=training_args.lora_r,
                                  lora_alpha=training_args.lora_alpha,
                                  target_modules=find_all_linear_names(model),
                                  lora_dropout=training_args.lora_dropout,
                                  bias=training_args.lora_bias,
-                                 task_type="CAUSAL_LM",
-                                 )
+                                 task_type="CAUSAL_LM",)
         if training_args.bits == 16:
             if training_args.bf16:
                 model.to(torch.bfloat16)
@@ -838,6 +840,7 @@ def train():
                 model.to(torch.float16)
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model, lora_config)
+
     print(f' (5.2) tokenizer')
     if 'mpt' in model_args.model_name_or_path:
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
@@ -845,13 +848,12 @@ def train():
                                                                model_max_length=training_args.model_max_length,
                                                                padding_side="right")
     else:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
-                                                               cache_dir=training_args.cache_dir,
+        # get AutoTokenizer aligned with Llama model
+        tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path, cache_dir=training_args.cache_dir,
                                                                model_max_length=training_args.model_max_length,
-                                                               padding_side="right",
-                                                               use_fast=False,)
+                                                               padding_side="right", use_fast=False,)
 
-    print(f' (5.2) tokenizer')
+    print(f' model_args.version = {model_args.version}')
     if model_args.version == "v0":
         if tokenizer.pad_token is None:
             smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"),
@@ -865,7 +867,7 @@ def train():
             conversation_lib.default_conversation = conversation_lib.conv_templates[model_args.version]
         else:
             conversation_lib.default_conversation = conversation_lib.conv_templates["vicuna_v1"]
-
+    """
     if model_args.vision_tower is not None:
         # pay attention, here we require the model not to reload mm_projector again within this function
         model.get_model().initialize_vision_modules(model_args=model_args,
@@ -944,7 +946,7 @@ def train():
     else:
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
-    
+    """
 
 if __name__ == "__main__":
     train()
