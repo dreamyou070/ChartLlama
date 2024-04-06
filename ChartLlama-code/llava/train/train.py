@@ -744,8 +744,8 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
                                 data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
     train_dataset = LazySupervisedDataset(tokenizer=tokenizer,
-                                data_path=data_args.data_path,
-                                data_args=data_args)
+                                          data_path=data_args.data_path,
+                                          data_args=data_args)
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
     return dict(train_dataset=train_dataset,
                 eval_dataset=None,
@@ -843,38 +843,35 @@ def train():
                                                                model_max_length=training_args.model_max_length,
                                                                padding_side="right")
     else:
-        # get AutoTokenizer aligned with Llama model
+        # with installing sentencepiece
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path, cache_dir=training_args.cache_dir,
                                                                model_max_length=training_args.model_max_length,
                                                                padding_side="right", use_fast=False,)
 
-    print(f' model_args.version = {model_args.version}')
+    # model_args.version = llava_llama_2
     if model_args.version == "v0":
-        if tokenizer.pad_token is None:
-            smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"),
-                                                 tokenizer=tokenizer,
-                                                 model=model,)
-    elif model_args.version == "v0.5":
+        if tokenizer.pad_token is None: smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"), tokenizer=tokenizer, model=model,)
+    elif model_args.version == "v0.5": tokenizer.pad_token = tokenizer.unk_token
+    else : # llava_llama_2
         tokenizer.pad_token = tokenizer.unk_token
-    else:
-        tokenizer.pad_token = tokenizer.unk_token
+        print(f'conversation_lib.conv_templates : {conversation_lib.conv_templates}')
         if model_args.version in conversation_lib.conv_templates:
             conversation_lib.default_conversation = conversation_lib.conv_templates[model_args.version]
         else:
             conversation_lib.default_conversation = conversation_lib.conv_templates["vicuna_v1"]
-    """
+
+    print(f' step 7. vision tower')
     if model_args.vision_tower is not None:
-        # pay attention, here we require the model not to reload mm_projector again within this function
-        model.get_model().initialize_vision_modules(model_args=model_args,
-                                                    fsdp=training_args.fsdp)
+        print(f' (7.0) initialize vision model with openai model')
+        model.get_model().initialize_vision_modules(model_args=model_args, fsdp=training_args.fsdp)
         vision_tower = model.get_vision_tower()
         vision_tower.to(dtype=torch.bfloat16 if training_args.bf16 else torch.float16, device=training_args.device)
+        print(f' (7.1) change data_argument')
         data_args.image_processor = vision_tower.image_processor
         data_args.is_multimodal = True
-
+        print(f' (7.2) change model config aligning with vision tower')
         model.config.image_aspect_ratio = data_args.image_aspect_ratio
         model.config.image_grid_pinpoints = data_args.image_grid_pinpoints
-
         model.config.tune_mm_mlp_adapter = training_args.tune_mm_mlp_adapter = model_args.tune_mm_mlp_adapter
         if model_args.tune_mm_mlp_adapter:
             model.requires_grad_(False)
@@ -912,19 +909,19 @@ def train():
                     if training_args.bf16 and module.weight.dtype == torch.float32:
                         module = module.to(torch.bfloat16)
 
-    data_module = make_supervised_data_module(tokenizer=tokenizer,
-                                              data_args=data_args)
-    trainer = LLaVATrainer(model=model,
-                    tokenizer=tokenizer,
-                    args=training_args,
-                    **data_module)
+    print(f'\n step 8. data module')
+    data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
 
+    print(f'\n step 9. Trainer')
+    trainer = LLaVATrainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
+    
+    """
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)
     else:
         trainer.train()
     trainer.save_state()
-
+    
     model.config.use_cache = True
 
     if training_args.lora_enable:
