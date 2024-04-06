@@ -11,8 +11,8 @@ super_parent = os.path.dirname(parent)
 sys.path.append(super_parent)
 from llava.train.llama_flash_attn_monkey_patch import replace_llama_attn_with_flash_attn
 #replace_llama_attn_with_flash_attn()
-#from llava.train.train import train
+from llava.train.train import train
 
-#if __name__ == "__main__":
-#    train()
+if __name__ == "__main__":
+    train()
 
