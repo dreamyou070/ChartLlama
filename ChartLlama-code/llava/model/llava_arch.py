@@ -40,6 +40,8 @@ class LlavaMetaModel:
         return vision_tower
 
     def initialize_vision_modules(self, model_args, fsdp=None):
+        # what is mm_mlp_adapter ?
+        # what is mm ?
         vision_tower = model_args.vision_tower
         mm_vision_select_layer = model_args.mm_vision_select_layer
         mm_vision_select_feature = model_args.mm_vision_select_feature
@@ -64,14 +66,13 @@ class LlavaMetaModel:
         if not model_args.lora_further_tune_finetuned:
             # --------------------------------------------------------------------------------------------------------
             # vision projector
-            self.mm_projector = build_vision_projector(self.config)
+            self.mm_projector = build_vision_projector(self.config) # Linear(in_features=1024, out_features=4096, bias=True)
         else:
             print("###########use pretrained mm_projector")
-
-        print(f'self.mm_projector = {self.mm_projector}')
+        # self.mm_projector = Linear(in_features=1024, out_features=4096, bias=True)
+        # pretrain_mm_mlp_adapter = mm_projector.bin
 
         # [2] pretrained mm mlp adapter
-        print(f'pretrain_mm_mlp_adapter = {pretrain_mm_mlp_adapter}')
         if pretrain_mm_mlp_adapter is not None:
             # Load pretrained mm_projector
             mm_projector_weights = torch.load(pretrain_mm_mlp_adapter, map_location='cpu')

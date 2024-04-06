@@ -14,11 +14,11 @@
 # model_name_or_path = /your_path_to/LLaVA/checkpoints/${output_name}
 ################## LLaMA-2 ##################
 PROMPT_VERSION="llava_llama_2"
-MODEL_VERSION="llama-2-7b-chat" # MODEL_VERSION=llama-2-7b-chat
+MODEL_VERSION="llava-v1.5-7b" # MODEL_VERSION=llama-2-7b-chat
 ################## LLaMA-2 ##################
 
 python ChartLlama-code/llava/train/train_mem.py \
-    --model_name_or_path "/share0/dreamyou070/dreamyou070/pretrained_model/${MODEL_VERSION}" \
+    --model_name_or_path "/share0/dreamyou070/dreamyou070/pretrained_model/liuhaotian/${MODEL_VERSION}" \
     --version $PROMPT_VERSION \
     --data_path ./playground/data/llava_instruct_80k.json \
     --image_folder ./data/coco/train2017 \
