@@ -775,6 +775,7 @@ def train():
     bnb_model_from_pretrained_args = {}
     print(f'training_args.bits = {training_args.bits}')
     if training_args.bits in [4, 8]:
+        # updating the argument (loading bits)
         from transformers import BitsAndBytesConfig
         bnb_model_from_pretrained_args.update(dict(device_map={"": training_args.device},
                                                    load_in_4bit=training_args.bits == 4,
