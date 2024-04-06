@@ -792,28 +792,24 @@ def train():
             model = LlavaMPTForCausalLM.from_pretrained(model_args.model_name_or_path, config=config, cache_dir=training_args.cache_dir, **bnb_model_from_pretrained_args)
         else:
             # model_name_or_path = model_name_or_path = Llama
-            print(f' training_args.cache_dir = {training_args.cache_dir}')
             # different from trnasformer LlamaForCausalLM, have head model
             model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
-                                                          cache_dir=training_args.cache_dir, **bnb_model_from_pretrained_args)
+                                                          cache_dir=training_args.cache_dir, # None
+                                                          **bnb_model_from_pretrained_args)
     else:
         # if without vision model, use only transformer Language Model
         model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path, cache_dir=training_args.cache_dir, **bnb_model_from_pretrained_args)
 
-    print(f' (4.3) backbone')
+    print(f' (4.3) backbone (not freezing, but training)')
     model.config.use_cache = False
-    print(f'LLM config = {model.config}')
-    print(f'model_args freeze? = {model_args.freeze_backbone}')
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
     if training_args.bits in [4, 8] :
-        # change bit of the model
         from peft import prepare_model_for_kbit_training
         model.config.torch_dtype=(torch.float32 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=training_args.gradient_checkpointing)
 
-    print(f' when training, gradient checkpoint? = {training_args.gradient_checkpointing}')
-    if training_args.gradient_checkpointing:
+    if training_args.gradient_checkpointing: # gradient checking
         if hasattr(model, "enable_input_require_grads"):
             model.enable_input_require_grads()
         else:
@@ -822,8 +818,7 @@ def train():
             # model token embedding gradient checking
             model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
 
-    print(f' step 5. lora training ?')
-    print(f' training_args.lora_enable = {training_args.lora_enable}')
+    print(f' step 5. lora training ? (no) ')
     if training_args.lora_enable:
         # no training lora
         from peft import LoraConfig, get_peft_model
@@ -841,7 +836,7 @@ def train():
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model, lora_config)
 
-    print(f' (5.2) tokenizer')
+    print(f' step 6. tokenizer')
     if 'mpt' in model_args.model_name_or_path:
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
                                                                cache_dir=training_args.cache_dir,
