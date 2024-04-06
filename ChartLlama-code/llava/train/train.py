@@ -21,11 +21,8 @@ import json
 import logging
 import pathlib
 from typing import Dict, Optional, Sequence, List
-
 import torch
-
 import transformers
-
 from llava.constants import IGNORE_INDEX, IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 from torch.utils.data import Dataset
 from llava.train.llava_trainer import LLaVATrainer
@@ -771,11 +768,10 @@ def train():
 
     print(f' step 4. model')
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
-    print(f' (4.1) bnb_model')
+    print(f' (4.1) bnb_model argument (present bits = 16) ')
     bnb_model_from_pretrained_args = {}
     print(f'training_args.bits = {training_args.bits}')
     if training_args.bits in [4, 8]:
-        # updating the argument (loading bits)
         from transformers import BitsAndBytesConfig
         bnb_model_from_pretrained_args.update(dict(device_map={"": training_args.device},
                                                    load_in_4bit=training_args.bits == 4,
@@ -787,18 +783,8 @@ def train():
                                                                                           bnb_4bit_compute_dtype=compute_dtype,
                                                                                           bnb_4bit_use_double_quant=training_args.double_quant,
                                                                                           bnb_4bit_quant_type=training_args.quant_type)))
-
-
-
-
-
-
-
-
-
-
-
-    print(f' (4.2) vision tower')
+    print(f' (4.2) Language Model')
+    print(f' model_args.vision_tower = {model_args.vision_tower}')
     if model_args.vision_tower is not None:
         if 'mpt' in model_args.model_name_or_path:
             config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
@@ -810,7 +796,8 @@ def train():
         else:
             # ---------------------------------------------------------------------------------------------------------------------------------------
             # Loading Vision Tower
-            # model_name_or_path =
+            # model_name_or_path = model_name_or_path = openai/
+            print(f'language model pretrained model name = Chat')
             model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
                                                           cache_dir=training_args.cache_dir,
                                                           **bnb_model_from_pretrained_args)
@@ -818,8 +805,9 @@ def train():
         model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
                                                               cache_dir=training_args.cache_dir,
                                                               **bnb_model_from_pretrained_args)
-    model.config.use_cache = False
+
     print(f' (4.3) backbone')
+    model.config.use_cache = False
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
     if training_args.bits in [4, 8]:
@@ -957,7 +945,7 @@ def train():
     else:
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
-
+    """
 
 if __name__ == "__main__":
     train()
