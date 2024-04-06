@@ -768,6 +768,7 @@ def train():
 
     print(f' step 3. dtype')
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
+    print(f' my dtype = {compute_dtype}')
 
     print(f' step 4. model')
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
@@ -809,12 +810,10 @@ def train():
     print(f' (4.3) backbone')
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
-
     if training_args.bits in [4, 8]:
         from peft import prepare_model_for_kbit_training
         model.config.torch_dtype=(torch.float32 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=training_args.gradient_checkpointing)
-
     if training_args.gradient_checkpointing:
         if hasattr(model, "enable_input_require_grads"):
             model.enable_input_require_grads()
@@ -822,18 +821,17 @@ def train():
             def make_inputs_require_grad(module, input, output):
                 output.requires_grad_(True)
             model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
-    """
-    print(f' step 4. model')
+
+    print(f' step 5. lora training ?')
     if training_args.lora_enable:
         from peft import LoraConfig, get_peft_model
-        lora_config = LoraConfig(
-            r=training_args.lora_r,
-            lora_alpha=training_args.lora_alpha,
-            target_modules=find_all_linear_names(model),
-            lora_dropout=training_args.lora_dropout,
-            bias=training_args.lora_bias,
-            task_type="CAUSAL_LM",
-        )
+        lora_config = LoraConfig(r=training_args.lora_r,
+                                 lora_alpha=training_args.lora_alpha,
+                                 target_modules=find_all_linear_names(model),
+                                 lora_dropout=training_args.lora_dropout,
+                                 bias=training_args.lora_bias,
+                                 task_type="CAUSAL_LM",
+                                 )
         if training_args.bits == 16:
             if training_args.bf16:
                 model.to(torch.bfloat16)
@@ -841,30 +839,25 @@ def train():
                 model.to(torch.float16)
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model, lora_config)
-
+    print(f' (5.2) tokenizer')
     if 'mpt' in model_args.model_name_or_path:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(
-            model_args.model_name_or_path,
-            cache_dir=training_args.cache_dir,
-            model_max_length=training_args.model_max_length,
-            padding_side="right"
-        )
+        tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
+                                                               cache_dir=training_args.cache_dir,
+                                                               model_max_length=training_args.model_max_length,
+                                                               padding_side="right")
     else:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(
-            model_args.model_name_or_path,
-            cache_dir=training_args.cache_dir,
-            model_max_length=training_args.model_max_length,
-            padding_side="right",
-            use_fast=False,
-        )
+        tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
+                                                               cache_dir=training_args.cache_dir,
+                                                               model_max_length=training_args.model_max_length,
+                                                               padding_side="right",
+                                                               use_fast=False,)
 
+    print(f' (5.2) tokenizer')
     if model_args.version == "v0":
         if tokenizer.pad_token is None:
-            smart_tokenizer_and_embedding_resize(
-                special_tokens_dict=dict(pad_token="[PAD]"),
-                tokenizer=tokenizer,
-                model=model,
-            )
+            smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"),
+                                                 tokenizer=tokenizer,
+                                                 model=model,)
     elif model_args.version == "v0.5":
         tokenizer.pad_token = tokenizer.unk_token
     else:
@@ -876,14 +869,10 @@ def train():
 
     if model_args.vision_tower is not None:
         # pay attention, here we require the model not to reload mm_projector again within this function
-        model.get_model().initialize_vision_modules(
-            model_args=model_args,
-            fsdp=training_args.fsdp
-        )
-        
+        model.get_model().initialize_vision_modules(model_args=model_args,
+                                                    fsdp=training_args.fsdp)
         vision_tower = model.get_vision_tower()
         vision_tower.to(dtype=torch.bfloat16 if training_args.bf16 else torch.float16, device=training_args.device)
-
         data_args.image_processor = vision_tower.image_processor
         data_args.is_multimodal = True
 

@@ -21,7 +21,7 @@ python ChartLlama-code/llava/train/train_mem.py \
     --model_name_or_path "/share0/dreamyou070/dreamyou070/pretrained_model/${MODEL_VERSION}" \
     --version $PROMPT_VERSION \
     --data_path ./playground/data/llava_instruct_80k.json \
-    --image_folder data/coco/train2017 \
+    --image_folder ./data/coco/train2017 \
     --vision_tower openai/clip-vit-large-patch14 \
     --pretrain_mm_mlp_adapter "/share0/dreamyou070/dreamyou070/pretrained_model/ChartLlama/mm_projector.bin" \
     --mm_vision_select_layer -2 \
