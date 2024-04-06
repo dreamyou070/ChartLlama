@@ -769,26 +769,21 @@ def train():
     print(f' step 3. dtype')
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
 
-    """
+    print(f' step 4. model')
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
     bnb_model_from_pretrained_args = {}
     if training_args.bits in [4, 8]:
         from transformers import BitsAndBytesConfig
-        bnb_model_from_pretrained_args.update(dict(
-            device_map={"": training_args.device},
-            load_in_4bit=training_args.bits == 4,
-            load_in_8bit=training_args.bits == 8,
-            quantization_config=BitsAndBytesConfig(
-                load_in_4bit=training_args.bits == 4,
-                load_in_8bit=training_args.bits == 8,
-                llm_int8_threshold=6.0,
-                llm_int8_has_fp16_weight=False,
-                bnb_4bit_compute_dtype=compute_dtype,
-                bnb_4bit_use_double_quant=training_args.double_quant,
-                bnb_4bit_quant_type=training_args.quant_type # {'fp4', 'nf4'}
-            )
-        ))
-
+        bnb_model_from_pretrained_args.update(dict(device_map={"": training_args.device},
+                                                   load_in_4bit=training_args.bits == 4,
+                                                   load_in_8bit=training_args.bits == 8,
+                                                   quantization_config=BitsAndBytesConfig(load_in_4bit=training_args.bits == 4,
+                                                                                          load_in_8bit=training_args.bits == 8,
+                                                                                          llm_int8_threshold=6.0,
+                                                                                          llm_int8_has_fp16_weight=False,
+                                                                                          bnb_4bit_compute_dtype=compute_dtype,
+                                                                                          bnb_4bit_use_double_quant=training_args.double_quant,
+                                                                                          bnb_4bit_quant_type=training_args.quant_type)))
     if model_args.vision_tower is not None:
         if 'mpt' in model_args.model_name_or_path:
             config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
@@ -828,7 +823,8 @@ def train():
             def make_inputs_require_grad(module, input, output):
                 output.requires_grad_(True)
             model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
-
+    """
+    print(f' step 4. model')
     if training_args.lora_enable:
         from peft import LoraConfig, get_peft_model
         lora_config = LoraConfig(
