@@ -23,7 +23,7 @@ python ChartLlama-code/llava/train/train_mem.py \
     --data_path ./playground/data/llava_instruct_80k.json \
     --image_folder ./data/coco/train2017 \
     --vision_tower openai/clip-vit-large-patch14 \
-    --pretrain_mm_mlp_adapter "/share0/dreamyou070/dreamyou070/pretrained_model/${MODEL_VERSION}/mm_projector.bin" \
+    --pretrain_mm_mlp_adapter "./checkpoints/llava-${MODEL_VERSION}/mm_projector.bin" \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
     --mm_use_im_patch_token False \
