@@ -768,9 +768,8 @@ def train():
 
     print(f' step 4. model')
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
-    print(f' (4.1) bnb_model argument (present bits = 16) ')
+    print(f' (4.0) training argument (present bits = 16) ')
     bnb_model_from_pretrained_args = {}
-    print(f'training_args.bits = {training_args.bits}')
     if training_args.bits in [4, 8]:
         from transformers import BitsAndBytesConfig
         bnb_model_from_pretrained_args.update(dict(device_map={"": training_args.device},
@@ -783,7 +782,7 @@ def train():
                                                                                           bnb_4bit_compute_dtype=compute_dtype,
                                                                                           bnb_4bit_use_double_quant=training_args.double_quant,
                                                                                           bnb_4bit_quant_type=training_args.quant_type)))
-    print(f' (4.2) Language Model')
+    print(f' (4.1) Language Model')
     print(f' model_args.vision_tower = {model_args.vision_tower}')
     if model_args.vision_tower is not None:
         if 'mpt' in model_args.model_name_or_path:
@@ -945,7 +944,7 @@ def train():
     else:
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
-    """
+    
 
 if __name__ == "__main__":
     train()
