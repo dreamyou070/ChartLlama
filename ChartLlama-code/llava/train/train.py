@@ -771,6 +771,7 @@ def train():
 
     print(f' step 4. model')
     # bnb_model_from_pretrained_args = {'mm_vision_tower': model_args.vision_tower}
+    print(f' (4.1) bnb_model')
     bnb_model_from_pretrained_args = {}
     if training_args.bits in [4, 8]:
         from transformers import BitsAndBytesConfig
@@ -784,30 +785,28 @@ def train():
                                                                                           bnb_4bit_compute_dtype=compute_dtype,
                                                                                           bnb_4bit_use_double_quant=training_args.double_quant,
                                                                                           bnb_4bit_quant_type=training_args.quant_type)))
+    print(f' (4.2) vision tower')
     if model_args.vision_tower is not None:
         if 'mpt' in model_args.model_name_or_path:
             config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             config.attn_config['attn_impl'] = training_args.mpt_attn_impl
-            model = LlavaMPTForCausalLM.from_pretrained(
-                model_args.model_name_or_path,
-                config=config,
-                cache_dir=training_args.cache_dir,
-                **bnb_model_from_pretrained_args
-            )
+            model = LlavaMPTForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                        config=config,
+                                                        cache_dir=training_args.cache_dir,
+                                                        **bnb_model_from_pretrained_args)
         else:
-            model = LlavaLlamaForCausalLM.from_pretrained(
-                model_args.model_name_or_path,
-                cache_dir=training_args.cache_dir,
-                **bnb_model_from_pretrained_args
-            )
+            # ---------------------------------------------------------------------------------------------------------------------------------------
+            # Loading Vision Tower
+            # model_name_or_path =
+            model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                          cache_dir=training_args.cache_dir,
+                                                          **bnb_model_from_pretrained_args)
     else:
-        model = transformers.LlamaForCausalLM.from_pretrained(
-            model_args.model_name_or_path,
-            cache_dir=training_args.cache_dir,
-            **bnb_model_from_pretrained_args
-        )
+        model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                              cache_dir=training_args.cache_dir,
+                                                              **bnb_model_from_pretrained_args)
     model.config.use_cache = False
-
+    print(f' (4.3) backbone')
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
 

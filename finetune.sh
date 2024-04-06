@@ -11,9 +11,10 @@
 # --bf16 True \
 # --tf32 True \
 # scripts/zero2.json
+# model_name_or_path = /your_path_to/LLaVA/checkpoints/${output_name}
 ################## LLaMA-2 ##################
 PROMPT_VERSION="llava_llama_2"
-MODEL_VERSION="llama-2-7b-chat"
+MODEL_VERSION="llama-2-7b-chat" # MODEL_VERSION=llama-2-7b-chat
 ################## LLaMA-2 ##################
 
 python ChartLlama-code/llava/train/train_mem.py \
