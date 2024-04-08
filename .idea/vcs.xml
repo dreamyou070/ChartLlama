@@ -2,7 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ChartLlama-Dataset" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ChartLlama-code" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/LLaVA" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/LLaVA-CC3M-Pretrain-595K" vcs="Git" />
   </component>
 </project>
