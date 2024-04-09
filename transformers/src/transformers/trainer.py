@@ -1676,13 +1676,11 @@ class Trainer:
 
         return model
 
-    def train(
-        self,
-        resume_from_checkpoint: Optional[Union[str, bool]] = None,
-        trial: Union["optuna.Trial", Dict[str, Any]] = None,
-        ignore_keys_for_eval: Optional[List[str]] = None,
-        **kwargs,
-    ):
+    def train(self,
+              resume_from_checkpoint: Optional[Union[str, bool]] = None,
+              trial: Union["optuna.Trial", Dict[str, Any]] = None,
+              ignore_keys_for_eval: Optional[List[str]] = None,
+              **kwargs,):
         """
         Main training entry point.
 

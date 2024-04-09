@@ -7,12 +7,10 @@ vision_tower="openai/clip-vit-large-patch14-336"
 pretrain_mm_mlp_adapter="/share0/dreamyou070/dreamyou070/CharLlama/ChartLlama/training_result_sy/liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5/mm_projector.bin"
 mm_projector_type="mlp2x_gelu"
 # [2] data argument
-#data_path="/mnt/private_yucheng/chartgpt/LLaVA/playground/llava_mix_plus_chartqa.json"
 data_path='data/ChartLlama-Dataset/ours/box_chart_100examples_simplified_qa.json'
-# image_folder /mnt/private_yucheng/chartgpt/LLaVA/playground/data \
 image_folder='data/ChartLlama-Dataset/ours/ours/box_chart/png'
-
 # [3] Training Argument
+
 deepspeed train.py \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path ${model_name_or_path} \
@@ -21,7 +19,7 @@ deepspeed train.py \
     --cache_dir training_result_sy \
     --freeze_backbone True \
     --lora_enable True \
-    --data_path /mnt/private_yucheng/chartgpt/LLaVA/playground/only_chartqa.json \
+    --data_path ${data_path} \
     --image_folder ${image_folder} \
     --image_aspect_ratio pad \
     --fp16 True \

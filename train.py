@@ -887,9 +887,10 @@ def train():
     # ----------------------------------------------------------------------------------------------------------------- #
     # ----------------------------------------------------------------------------------------------------------------- #
     print(f'\n step 3. make data module')
-    data_module = make_supervised_data_module(tokenizer=tokenizer,
-                                              data_args=data_args)
+    data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
 
+    # ----------------------------------------------------------------------------------------------------------------- #
+    # ----------------------------------------------------------------------------------------------------------------- #
     print(f'\n step 4. make trainer')
     trainer = LLaVATrainer(model=model,
                            tokenizer=tokenizer,
