@@ -7,7 +7,7 @@ pretrain_mm_mlp_adapter="/share0/dreamyou070/dreamyou070/CharLlama/ChartLlama/tr
 mm_projector_type="mlp2x_gelu"
 # [2] data argument
 data_path='data/ChartLlama-Dataset/box_chart_100examples_simplified_qa.json'
-image_folder='data/ChartLlama-Dataset/ours/ours/box_chart/png'
+image_folder='data/ChartLlama-Dataset/ours'
 # [3] Training Argument
 
 deepspeed train.py \
