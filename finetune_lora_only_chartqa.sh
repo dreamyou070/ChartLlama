@@ -6,18 +6,10 @@
 
 ################## VICUNA ##################
 # PROMPT_VERSION=v1
-# MODEL_VERSION="vicuna-v1-3-7b"
-################## VICUNA ##################
-
-################## LLaMA-2 ##################
-# PROMPT_VERSION="llava_llama_2"
-# MODEL_VERSION="llama-2-7b-chat"
-################## LLaMA-2 ##################
-
-################## vicuna-v1.5 ##################
-# MODEL_VERSION="llama-2-7b-chat"
-################## vicuna-v1.5 ##################
-
+model_name_or_path="lmsys/vicuna-13b-v1.5"
+VERSION="v1"
+vision_tower="openai/clip-vit-large-patch14-336"
+pretrain_mm_mlp_adapter="liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin" # ???
 
 # the mm_mlp_adapter is ignored
 #--pretrain_mm_mlp_adapter /mnt/private_yucheng/huggingface_hub/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin \
@@ -28,13 +20,11 @@
 # [1] model argument (what is mm ?)
 #model_name_or_path="/mnt/gyfs/yuchenghan/llama2_models/vicuna-13b-v1.5"
 
-# I think i need to change name
-model_name_or_path="lmsys/vicuna-13b-v1.5"
 
-version="v1"
-vision_tower="openai/clip-vit-large-patch14-336"
+
+
 #pretrain_mm_mlp_adapter="/mnt/private_yucheng/huggingface_hub/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin"
-pretrain_mm_mlp_adapter="liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin"
+
 mm_projector_type="mlp2x_gelu"
 
 # [2] data argument
@@ -50,13 +40,11 @@ image_folder='data/ChartLlama-Dataset/ours/ours/box_chart/png'
 deepspeed train.py \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path ${model_name_or_path} \
-    --version ${version} \
+    --version ${VERSION} \
     --vision_tower ${vision_tower} \
     --pretrain_mm_mlp_adapter ${pretrain_mm_mlp_adapter} \
-    --mm_projector_type mlp2x_gelu \
-    --mm_vision_select_layer -2 \
-    --mm_use_im_start_end False \
-    --mm_use_im_patch_token False \
+    --cache_dir training_result_sy \
+    --freeze_backbone True \
     --lora_enable True \
     --data_path /mnt/private_yucheng/chartgpt/LLaVA/playground/only_chartqa.json \
     --image_folder ${image_folder} \
@@ -81,4 +69,9 @@ deepspeed train.py \
     --model_max_length 2048 \
     --gradient_checkpointing True \
     --lazy_preprocess True \
-    --dataloader_num_workers 4
+    --dataloader_num_workers 4 \
+    --mm_projector_type mlp2x_gelu \
+    --mm_vision_select_layer -2 \
+    --mm_use_im_start_end False \
+    --mm_use_im_patch_token False \
+    --lora_further_tune_finetuned True

@@ -35,17 +35,18 @@ class LlavaLlamaModel(LlavaMetaModel, LlamaModel):
     config_class = LlavaConfig
 
     def __init__(self, config: LlamaConfig):
-        super(LlavaLlamaModel, self).__init__(config)
+        super(LlavaLlamaModel, self).__init__(config) # mlp2x_gelu
 
 
-class LlavaLlamaForCausalLM(LlamaForCausalLM, LlavaMetaForCausalLM):
+class LlavaLlamaForCausalLM(LlamaForCausalLM,
+                            LlavaMetaForCausalLM):
     config_class = LlavaConfig
 
     def __init__(self, config):
         super(LlamaForCausalLM, self).__init__(config)
         self.model = LlavaLlamaModel(config)
 
-        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False) # one layer
 
         # Initialize weights and apply final processing
         self.post_init()

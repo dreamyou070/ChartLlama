@@ -6,7 +6,6 @@ from tqdm import tqdm
 import shortuuid
 import warnings
 import shutil
-
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, BitsAndBytesConfig
 from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 from llava.conversation import conv_templates, SeparatorStyle
@@ -117,6 +116,7 @@ def get_chunk(lst, n, k):
 
 # Custom dataset class
 class CustomDataset(Dataset):
+
     def __init__(self, questions, image_folder, tokenizer, image_processor, model_config):
         self.questions = questions
         self.image_folder = image_folder
@@ -125,23 +125,41 @@ class CustomDataset(Dataset):
         self.model_config = model_config
 
     def __getitem__(self, index):
+
+        # [1] get one line
         line = self.questions[index]
-        image_file = line["image"]
+
+        # [2] get image file
+        image_file = line["image"] # image_path
+
+        # [3] human asking
+        # DEFAULT_IMAGE_TOKEN = <image> --> What is the title of the chart?
+        # DEFAULT_IM_START_TOKEN + (DEFAULT_IMAGE_TOKEN) + DEFAULT_IM_END_TOKEN
         qs = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
         if self.model_config.mm_use_im_start_end:
             qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + qs
         else:
             qs = DEFAULT_IMAGE_TOKEN + '\n' + qs
 
+        # conv_mode = vicuna_v1 -> conv_vicuna_v1
         conv = conv_templates[args.conv_mode].copy()
+        print(f'conv (conv_vicuna_v1) = {conv}')
+        # conv.roles[0] = USER
+        # conv.roles[1] =  ASSISTANT
         conv.append_message(conv.roles[0], qs)
-        conv.append_message(conv.roles[1], None)
-        prompt = conv.get_prompt()
+        conv.append_message(conv.roles[1], None) # no answer
 
+        # [5] input image
         image = Image.open(os.path.join(self.image_folder, image_file)).convert('RGB')
         image_tensor = process_images([image], self.image_processor, self.model_config)[0]
 
-        input_ids = tokenizer_image_token(prompt, self.tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt')
+        # [4] get prompt
+        prompt = conv.get_prompt()
+        print(f'prompt = {prompt}')
+        input_ids = tokenizer_image_token(prompt,
+                                          self.tokenizer,
+                                          IMAGE_TOKEN_INDEX,
+                                          return_tensors='pt')
 
         return input_ids, image_tensor
 
@@ -178,11 +196,14 @@ def eval_model(args):
     if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
         args.conv_mode = args.conv_mode + '_mmtag'
         print(f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
-    data_loader = create_data_loader(questions, args.image_folder, tokenizer, image_processor, model.config)
+    data_loader = create_data_loader(questions,
+                                     args.image_folder,
+                                     tokenizer,
+                                     image_processor,
+                                     model.config)
 
 
     print(f'\n step 3. Inference')
-
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["id"]
         cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()

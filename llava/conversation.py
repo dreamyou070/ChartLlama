@@ -27,6 +27,7 @@ class Conversation:
     skip_next: bool = False
 
     def get_prompt(self):
+        # message ?
         messages = self.messages
         if len(messages) > 0 and type(messages[0][1]) is tuple:
             messages = self.messages.copy()
@@ -48,6 +49,8 @@ class Conversation:
                     ret += role + ": " + message + self.sep
                 else:
                     ret += role + ":"
+
+
         elif self.sep_style == SeparatorStyle.TWO:
             seps = [self.sep, self.sep2]
             ret = self.system + seps[0]
@@ -58,6 +61,7 @@ class Conversation:
                     ret += role + ": " + message + seps[i % 2]
                 else:
                     ret += role + ":"
+
         elif self.sep_style == SeparatorStyle.MPT:
             ret = self.system + self.sep
             for role, message in messages:
@@ -67,6 +71,7 @@ class Conversation:
                     ret += role + message + self.sep
                 else:
                     ret += role
+
         elif self.sep_style == SeparatorStyle.LLAMA_2:
             wrap_sys = lambda msg: f"<<SYS>>\n{msg}\n<</SYS>>\n\n"
             wrap_inst = lambda msg: f"[INST] {msg} [/INST]"
@@ -100,7 +105,7 @@ class Conversation:
                     ret += ""
         else:
             raise ValueError(f"Invalid style: {self.sep_style}")
-
+        # prompt (is message)
         return ret
 
     def append_message(self, role, message):
@@ -249,17 +254,7 @@ conv_vicuna_v0 = Conversation(
     sep="###",
 )
 
-conv_vicuna_v1 = Conversation(
-    system="A chat between a curious user and an artificial intelligence assistant. "
-    "The assistant gives helpful, detailed, and polite answers to the user's questions.",
-    roles=("USER", "ASSISTANT"),
-    version="v1",
-    messages=(),
-    offset=0,
-    sep_style=SeparatorStyle.TWO,
-    sep=" ",
-    sep2="</s>",
-)
+
 
 conv_llama_2 = Conversation(
     system="""You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
@@ -312,11 +307,21 @@ conv_llava_v0 = Conversation(
     system="A chat between a curious human and an artificial intelligence assistant. "
            "The assistant gives helpful, detailed, and polite answers to the human's questions.",
     roles=("Human", "Assistant"),
-    messages=(
-    ),
+    messages=(),
     offset=0,
     sep_style=SeparatorStyle.SINGLE,
     sep="###",
+)
+conv_vicuna_v1 = Conversation(
+    system="A chat between a curious user and an artificial intelligence assistant. "
+           "The assistant gives helpful, detailed, and polite answers to the user's questions.",
+    roles=("USER", "ASSISTANT"),
+    version="v1",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.TWO,
+    sep=" ",
+    sep2="</s>",
 )
 
 conv_llava_v0_mmtag = Conversation(
