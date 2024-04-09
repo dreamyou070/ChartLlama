@@ -42,9 +42,10 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
 
         print(f' [2] loading lora config)')
-        lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
-        lora_cfg_pretrained['mm_vision_tower'] = 'openai/clip-vit-large-patch14-336'
+        lora_cfg_pretrained = AutoConfig.from_pretrained(model_path) # LlavaConfig
+        lora_cfg_pretrained.mm_vision_tower = args.vision_tower
         print(f'lora_cfg_pretrained: {lora_cfg_pretrained}')
+
         print(f' [3] base model')
         model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                       low_cpu_mem_usage=True,
@@ -221,7 +222,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", type=str, required=True)
     parser.add_argument("--model-base", type=str, default='/mnt/private_yucheng/huggingface_hub/llava-v1.5-13b')
-
+    parser.add_argument("--vision_tower", type=str, default='openai/clip-vit-large-patch14-336')
     parser.add_argument("--question-file", type=str, required=True)
     parser.add_argument("--image-folder", type=str, default="/mnt/private_yucheng/chartgpt/LLaVA/playground/data")
     parser.add_argument("--answers-file", type=str, default="answer.jsonl")
