@@ -749,8 +749,8 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
                                 data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
     train_dataset = LazySupervisedDataset(tokenizer=tokenizer,
-                                data_path=data_args.data_path,
-                                data_args=data_args)
+                                          data_path=data_args.data_path, # data_path =
+                                          data_args=data_args)
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
     return dict(train_dataset=train_dataset,
                 eval_dataset=None,
@@ -913,26 +913,21 @@ def train():
                                               data_args=data_args)
 
     print(f'\n step 4. make trainer')
-    trainer = LLaVATrainer(model=model,
-                        tokenizer=tokenizer,
-                        args=training_args,
-                        **data_module)
+    trainer = LLaVATrainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
 
+    print(f'\n step 5. Train !')
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)
     else:
         trainer.train()
+
+    """
+    print(f'\n [after training] step 6. save model')
     trainer.save_state()
-
     model.config.use_cache = True
-
     if training_args.lora_enable:
-        state_dict = get_peft_state_maybe_zero_3(
-            model.named_parameters(), training_args.lora_bias
-        )
-        non_lora_state_dict = get_peft_state_non_lora_maybe_zero_3(
-            model.named_parameters()
-        )
+        state_dict = get_peft_state_maybe_zero_3(model.named_parameters(), training_args.lora_bias)
+        non_lora_state_dict = get_peft_state_non_lora_maybe_zero_3(model.named_parameters())
         if training_args.local_rank == 0 or training_args.local_rank == -1:
             model.config.save_pretrained(training_args.output_dir)
             model.save_pretrained(training_args.output_dir, state_dict=state_dict)
@@ -940,7 +935,7 @@ def train():
     else:
         safe_save_model_for_hf_trainer(trainer=trainer,
                                        output_dir=training_args.output_dir)
-
+    """
 
 if __name__ == "__main__":
     train()
