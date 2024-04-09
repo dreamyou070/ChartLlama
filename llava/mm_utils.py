@@ -3,7 +3,7 @@ from io import BytesIO
 import base64
 
 import torch
-from transformers_sy import StoppingCriteria
+from transformers import StoppingCriteria
 from llava.constants import IMAGE_TOKEN_INDEX
 
 

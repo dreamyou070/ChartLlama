@@ -8,8 +8,8 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers_sy import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
-from transformers_sy.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast
+from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
+from transformers.modeling_outputs import BaseModelOutputWithPast, CausalLMOutputWithPast
 from .attention import attn_bias_shape, build_attn_bias
 from .blocks import MPTBlock
 from .custom_embedding import SharedEmbedding

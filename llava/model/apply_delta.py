@@ -6,7 +6,7 @@ import argparse
 
 import torch
 from tqdm import tqdm
-from transformers_sy import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from llava import LlavaLlamaForCausalLM
 
 

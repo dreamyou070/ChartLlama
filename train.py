@@ -24,7 +24,7 @@ from typing import Dict, Optional, Sequence, List
 
 import torch
 
-import transformers_sy
+import transformers
 
 from llava.constants import IGNORE_INDEX, IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 from torch.utils.data import Dataset
