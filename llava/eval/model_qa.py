@@ -1,5 +1,5 @@
 import argparse
-from transformers import AutoTokenizer, AutoModelForCausalLM, StoppingCriteria
+from transformers_sy import AutoTokenizer, AutoModelForCausalLM, StoppingCriteria
 import torch
 import os
 import json

@@ -22,9 +22,9 @@ import torch
 from torch import Tensor, nn
 import torch.nn.functional as F
 
-import transformers
-from transformers.trainer_utils import EvalPrediction
-from transformers.utils.generic import ModelOutput
+import transformers_sy
+from transformers_sy.trainer_utils import EvalPrediction
+from transformers_sy.utils.generic import ModelOutput
 
 from peft import PeftModel, LoraModel, LoraConfig
 
@@ -91,18 +91,18 @@ def make_generative_vlm(
         raise ValueError(f"Unknown model type: {model_name_or_path}")
 
 
-def get_transformer_hidden_size(model: transformers.PreTrainedModel):
+def get_transformer_hidden_size(model: transformers_sy.PreTrainedModel):
     if isinstance(model, PeftModel):
         return get_transformer_hidden_size(model.base_model)
 
     if isinstance(model, LoraModel):
         return get_transformer_hidden_size(model.model)
 
-    if isinstance(model, transformers.GPT2LMHeadModel):
+    if isinstance(model, transformers_sy.GPT2LMHeadModel):
         hidden_size_attr_name = "n_embd"
-    elif isinstance(model, transformers.OPTForCausalLM):
+    elif isinstance(model, transformers_sy.OPTForCausalLM):
         hidden_size_attr_name = "word_embed_proj_dim"
-    elif isinstance(model, transformers.T5ForConditionalGeneration):
+    elif isinstance(model, transformers_sy.T5ForConditionalGeneration):
         hidden_size_attr_name = "d_model"
     elif "modelling_RW.RWModel" in str(
         type(model)
@@ -112,9 +112,9 @@ def get_transformer_hidden_size(model: transformers.PreTrainedModel):
     else:
         # Hack to deal with the fact that transformers library changed the LLaMA model name.
         llama_cls = getattr(
-            transformers,
+            transformers_sy,
             "LLaMAForCausalLM"
-            if hasattr(transformers, "LLaMAForCausalLM")
+            if hasattr(transformers_sy, "LLaMAForCausalLM")
             else "LlamaForCausalLM",
         )
         if isinstance(model, llama_cls) or "LlamaForCausalLM" in str(type(model)):
@@ -125,7 +125,7 @@ def get_transformer_hidden_size(model: transformers.PreTrainedModel):
     return getattr(model.config, hidden_size_attr_name)
 
 
-class RewardConfig(transformers.PretrainedConfig):
+class RewardConfig(transformers_sy.PretrainedConfig):
     model_type = "reward_model"
 
     # Huggingface doesn't allow non-kwargs for `__init__`.
@@ -138,7 +138,7 @@ class RewardModelOutput(ModelOutput):
     rewards: Tensor = None
 
 
-class RewardModel(transformers.PreTrainedModel):
+class RewardModel(transformers_sy.PreTrainedModel):
     config_class = RewardConfig
     supports_gradient_checkpointing = True
 
@@ -218,7 +218,7 @@ class RewardModel(transformers.PreTrainedModel):
         return RewardModelOutput(rewards=rewards) if return_dict else (rewards,)
 
     def _set_gradient_checkpointing(self, module, value=False):
-        if isinstance(module, transformers.LlamaModel):
+        if isinstance(module, transformers_sy.LlamaModel):
             module.gradient_checkpointing = value
 
         # TODO(zhiqings): Hack to add support for Falcon.
@@ -240,7 +240,7 @@ def unwrap_model(model: nn.Module) -> nn.Module:
         return model
 
 
-class RewardModelTrainer(transformers.Trainer):
+class RewardModelTrainer(transformers_sy.Trainer):
     def _save(self, output_dir: Optional[str] = None, state_dict=None):
         if getattr(self.args, "tune_mm_mlp_adapter", False):
             # Save the model

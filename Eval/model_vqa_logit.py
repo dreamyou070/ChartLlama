@@ -25,7 +25,7 @@ from PIL import Image
 import math
 from peft import PeftModel
 
-from transformers import (
+from transformers_sy import (
     AutoTokenizer,
     BitsAndBytesConfig,
 )

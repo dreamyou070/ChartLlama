@@ -23,7 +23,7 @@ import random
 import einops
 import pandas as pd
 import torch
-import transformers
+import transformers_sy
 from datasets import load_dataset
 from torch.utils.data import Dataset
 
@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 def preprocess_for_reward_modeling(
     data: Sequence[dict],
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     df_postprocessor: Optional[Callable] = None,
     query_len: Optional[int] = None,
     response_len: Optional[int] = None,
@@ -142,7 +142,7 @@ class BinaryRewardModelingDataset(Dataset):
     def __init__(
         self,
         data: Sequence[dict],
-        tokenizer: transformers.PreTrainedTokenizer,
+        tokenizer: transformers_sy.PreTrainedTokenizer,
         df_postprocessor: Optional[Callable] = None,
         query_len: Optional[int] = None,
         response_len: Optional[int] = None,
@@ -300,7 +300,7 @@ class DataCollatorForBinaryRewardModelingDataset(object):
     i.e., 0 means the first sequence is preferred, and 1 means otherwise.
     """
 
-    tokenizer: transformers.PreTrainedTokenizer
+    tokenizer: transformers_sy.PreTrainedTokenizer
 
     def _left_pad_helper(self, instances: Sequence[dict], key: str):
         # TODO(lxuechen): Potentially replace with `transformers.PretrainedTokenizerBase.prepare_for_model`.
@@ -345,7 +345,7 @@ class DataCollatorForBinaryRewardModelingDataset(object):
 
 
 def make_binary_reward_modeling_data_module(
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     data_args,
     training_args,
 ):

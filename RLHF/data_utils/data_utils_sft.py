@@ -21,7 +21,7 @@ from typing import Dict, Sequence
 from PIL import Image
 
 import torch
-import transformers
+import transformers_sy
 from datasets import load_dataset
 from datasets import Dataset as HFDataset
 from torch.utils.data import Dataset
@@ -33,7 +33,7 @@ from data_utils.common_utils import preprocess, preprocess_multimodal
 
 @dataclass
 class DataCollatorForCausalLM(object):
-    tokenizer: transformers.PreTrainedTokenizer
+    tokenizer: transformers_sy.PreTrainedTokenizer
 
     def _left_pad_helper(self, instances: Sequence[dict], key: str, pad_token: int):
         # TODO(lxuechen): Potentially replace with `transformers.PretrainedTokenizerBase.prepare_for_model`.
@@ -224,7 +224,7 @@ def extract_v1_dataset(
 
 
 def make_sft_data_module(
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     args,
     data_args,
 ) -> Dict:

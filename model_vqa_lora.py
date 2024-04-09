@@ -6,7 +6,7 @@ from tqdm import tqdm
 import shortuuid
 import warnings
 import shutil
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, BitsAndBytesConfig
+from transformers_sy import AutoTokenizer, AutoModelForCausalLM, AutoConfig, BitsAndBytesConfig
 from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 from llava.conversation import conv_templates, SeparatorStyle
 # from llava.model.builder import load_pretrained_model

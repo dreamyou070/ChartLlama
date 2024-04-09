@@ -16,10 +16,10 @@
 from typing import Optional
 
 from torch import nn, optim
-from transformers import Trainer
-from transformers.optimization import get_scheduler
-from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
-from transformers.trainer_pt_utils import get_parameter_names
+from transformers_sy import Trainer
+from transformers_sy.optimization import get_scheduler
+from transformers_sy.pytorch_utils import ALL_LAYERNORM_LAYERS
+from transformers_sy.trainer_pt_utils import get_parameter_names
 
 
 def create_optimizer(

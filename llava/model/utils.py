@@ -1,4 +1,4 @@
-from transformers import AutoConfig
+from transformers_sy import AutoConfig
 
 
 def auto_upgrade(config):

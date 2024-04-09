@@ -9,15 +9,15 @@ import sys
 from typing import Optional, Dict, Sequence, List
 
 import torch
-import transformers
-from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
+import transformers_sy
+from transformers_sy.trainer_utils import PREFIX_CHECKPOINT_DIR
 
 from models.reward_model import RewardModel
 
 DEFAULT_PAD_TOKEN = "[PAD]"
 
 
-class SavePeftModelCallback(transformers.TrainerCallback):
+class SavePeftModelCallback(transformers_sy.TrainerCallback):
     def save_model(self, args, state, kwargs):
         print("Saving PEFT checkpoint...")
 

@@ -22,7 +22,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-import transformers
+import transformers_sy
 import datasets
 
 import data_utils.common_utils as utils
@@ -44,7 +44,7 @@ class QueryResponseDataset(Dataset):
     def __init__(
         self,
         df: pd.DataFrame,
-        tokenizer: transformers.PreTrainedTokenizer,
+        tokenizer: transformers_sy.PreTrainedTokenizer,
         query_len: int,
         df_postprocessor: Optional[Callable] = None,
         data_args: Optional[Dict] = None,
@@ -195,7 +195,7 @@ class DataCollatorForQueryResponseDataset(object):
 
 
 def make_rl_data_module(
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     data_args,
     training_args,
 ):
