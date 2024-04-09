@@ -39,7 +39,7 @@ import zipfile
 
 import torch
 
-from transformers import AutoTokenizer, GPT2Config
+from transformers_sy import AutoTokenizer, GPT2Config
 
 
 ####################################################################################################

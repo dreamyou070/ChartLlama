@@ -18,7 +18,7 @@ from os.path import join, exists
 
 import torch
 import bitsandbytes as bnb
-from transformers import BitsAndBytesConfig
+from transformers_sy import BitsAndBytesConfig
 
 from peft import (
     prepare_model_for_kbit_training,

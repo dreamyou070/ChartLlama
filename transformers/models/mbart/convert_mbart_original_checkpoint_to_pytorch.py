@@ -17,7 +17,7 @@ import argparse
 import torch
 from torch import nn
 
-from transformers import MBartConfig, MBartForConditionalGeneration
+from transformers_sy import MBartConfig, MBartForConditionalGeneration
 
 
 def remove_ignore_keys_(state_dict):

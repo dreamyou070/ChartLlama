@@ -27,7 +27,7 @@ from huggingface_hub import hf_hub_download
 from PIL import Image
 from torchvision.transforms import CenterCrop, Compose, Normalize, Resize, ToTensor
 
-from transformers import (
+from transformers_sy import (
     AutoTokenizer,
     CLIPImageProcessor,
     GitConfig,
@@ -36,7 +36,7 @@ from transformers import (
     GitVisionConfig,
     VideoMAEImageProcessor,
 )
-from transformers.utils import logging
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

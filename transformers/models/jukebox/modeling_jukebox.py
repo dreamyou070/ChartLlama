@@ -752,7 +752,7 @@ class JukeboxVQVAE(PreTrainedModel):
 
         Example:
         ```python
-        >>> from transformers import JukeboxVQVAE, set_seed
+        >>> from transformers_sy import JukeboxVQVAE, set_seed
         >>> import torch
 
         >>> model = JukeboxVQVAE.from_pretrained("openai/jukebox-1b-lyrics").eval()
@@ -2497,7 +2497,7 @@ class JukeboxModel(JukeboxPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, JukeboxModel, set_seed
+        >>> from transformers_sy import AutoTokenizer, JukeboxModel, set_seed
         >>> import torch
 
         >>> metas = dict(artist="Zac Brown Band", genres="Country", lyrics="I met a traveller from an antique land")
@@ -2590,7 +2590,7 @@ class JukeboxModel(JukeboxPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, JukeboxModel, set_seed
+        >>> from transformers_sy import AutoTokenizer, JukeboxModel, set_seed
 
         >>> model = JukeboxModel.from_pretrained("openai/jukebox-1b-lyrics", min_duration=0).eval()
         >>> tokenizer = AutoTokenizer.from_pretrained("openai/jukebox-1b-lyrics")

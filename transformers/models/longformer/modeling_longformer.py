@@ -1667,7 +1667,7 @@ class LongformerModel(LongformerPreTrainedModel):
 
         ```python
         >>> import torch
-        >>> from transformers import LongformerModel, AutoTokenizer
+        >>> from transformers_sy import LongformerModel, AutoTokenizer
 
         >>> model = LongformerModel.from_pretrained("allenai/longformer-base-4096")
         >>> tokenizer = AutoTokenizer.from_pretrained("allenai/longformer-base-4096")
@@ -1815,7 +1815,7 @@ class LongformerForMaskedLM(LongformerPreTrainedModel):
         Mask filling example:
 
         ```python
-        >>> from transformers import AutoTokenizer, LongformerForMaskedLM
+        >>> from transformers_sy import AutoTokenizer, LongformerForMaskedLM
 
         >>> tokenizer = AutoTokenizer.from_pretrained("allenai/longformer-base-4096")
         >>> model = LongformerForMaskedLM.from_pretrained("allenai/longformer-base-4096")
@@ -2052,7 +2052,7 @@ class LongformerForQuestionAnswering(LongformerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, LongformerForQuestionAnswering
+        >>> from transformers_sy import AutoTokenizer, LongformerForQuestionAnswering
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("allenai/longformer-large-4096-finetuned-triviaqa")

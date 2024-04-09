@@ -19,8 +19,8 @@ import argparse
 
 import torch
 
-from transformers import LxmertConfig, LxmertForPreTraining, load_tf_weights_in_lxmert
-from transformers.utils import logging
+from transformers_sy import LxmertConfig, LxmertForPreTraining, load_tf_weights_in_lxmert
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

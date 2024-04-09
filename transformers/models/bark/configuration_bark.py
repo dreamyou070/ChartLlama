@@ -241,7 +241,7 @@ class BarkConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import (
+    >>> from transformers_sy import (
     ...     BarkSemanticConfig,
     ...     BarkCoarseConfig,
     ...     BarkFineConfig,

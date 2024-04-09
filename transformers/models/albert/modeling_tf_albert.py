@@ -874,7 +874,7 @@ class TFAlbertForPreTraining(TFAlbertPreTrainedModel, TFAlbertPreTrainingLoss):
 
         ```python
         >>> import tensorflow as tf
-        >>> from transformers import AutoTokenizer, TFAlbertForPreTraining
+        >>> from transformers_sy import AutoTokenizer, TFAlbertForPreTraining
 
         >>> tokenizer = AutoTokenizer.from_pretrained("albert-base-v2")
         >>> model = TFAlbertForPreTraining.from_pretrained("albert-base-v2")
@@ -983,7 +983,7 @@ class TFAlbertForMaskedLM(TFAlbertPreTrainedModel, TFMaskedLanguageModelingLoss)
 
         ```python
         >>> import tensorflow as tf
-        >>> from transformers import AutoTokenizer, TFAlbertForMaskedLM
+        >>> from transformers_sy import AutoTokenizer, TFAlbertForMaskedLM
 
         >>> tokenizer = AutoTokenizer.from_pretrained("albert-base-v2")
         >>> model = TFAlbertForMaskedLM.from_pretrained("albert-base-v2")

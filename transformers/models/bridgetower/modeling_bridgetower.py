@@ -1299,7 +1299,7 @@ class BridgeTowerModel(BridgeTowerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import BridgeTowerProcessor, BridgeTowerModel
+        >>> from transformers_sy import BridgeTowerProcessor, BridgeTowerModel
         >>> from PIL import Image
         >>> import requests
 
@@ -1593,7 +1593,7 @@ class BridgeTowerForMaskedLM(BridgeTowerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import BridgeTowerProcessor, BridgeTowerForMaskedLM
+        >>> from transformers_sy import BridgeTowerProcessor, BridgeTowerForMaskedLM
         >>> from PIL import Image
         >>> import requests
 
@@ -1694,7 +1694,7 @@ class BridgeTowerForImageAndTextRetrieval(BridgeTowerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import BridgeTowerProcessor, BridgeTowerForImageAndTextRetrieval
+        >>> from transformers_sy import BridgeTowerProcessor, BridgeTowerForImageAndTextRetrieval
         >>> import requests
         >>> from PIL import Image
 
@@ -1807,7 +1807,7 @@ class BridgeTowerForContrastiveLearning(BridgeTowerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import BridgeTowerProcessor, BridgeTowerForContrastiveLearning
+        >>> from transformers_sy import BridgeTowerProcessor, BridgeTowerForContrastiveLearning
         >>> import requests
         >>> from PIL import Image
         >>> import torch

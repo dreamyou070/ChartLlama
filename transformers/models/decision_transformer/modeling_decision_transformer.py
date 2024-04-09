@@ -846,7 +846,7 @@ class DecisionTransformerModel(DecisionTransformerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import DecisionTransformerModel
+        >>> from transformers_sy import DecisionTransformerModel
         >>> import torch
 
         >>> model = DecisionTransformerModel.from_pretrained("edbeeching/decision-transformer-gym-hopper-medium")

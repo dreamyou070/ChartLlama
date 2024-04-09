@@ -1351,7 +1351,7 @@ class TFData2VecVisionForSemanticSegmentation(TFData2VecVisionPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, TFData2VecVisionForSemanticSegmentation
+        >>> from transformers_sy import AutoImageProcessor, TFData2VecVisionForSemanticSegmentation
         >>> from PIL import Image
         >>> import requests
 

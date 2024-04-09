@@ -846,7 +846,7 @@ class FlaxCLIPPreTrainedModel(FlaxPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, FlaxCLIPModel
+        >>> from transformers_sy import AutoTokenizer, FlaxCLIPModel
 
         >>> model = FlaxCLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         >>> tokenizer = AutoTokenizer.from_pretrained("openai/clip-vit-base-patch32")
@@ -904,7 +904,7 @@ class FlaxCLIPPreTrainedModel(FlaxPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, FlaxCLIPModel
+        >>> from transformers_sy import AutoProcessor, FlaxCLIPModel
 
         >>> model = FlaxCLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         >>> processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")

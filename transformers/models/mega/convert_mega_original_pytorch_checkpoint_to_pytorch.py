@@ -34,7 +34,7 @@ import pickle as pkl
 import torch
 from torch import nn
 
-from transformers import AutoTokenizer, MegaConfig, MegaForMaskedLM
+from transformers_sy import AutoTokenizer, MegaConfig, MegaForMaskedLM
 
 
 # import the EncoderLayer class used to pretrain

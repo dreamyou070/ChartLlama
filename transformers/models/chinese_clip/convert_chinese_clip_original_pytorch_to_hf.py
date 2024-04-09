@@ -17,7 +17,7 @@ import argparse
 
 import torch
 
-from transformers import ChineseCLIPConfig, ChineseCLIPModel
+from transformers_sy import ChineseCLIPConfig, ChineseCLIPModel
 
 
 def copy_attn_layer(hf_attn_layer, pt_weights, prefix):

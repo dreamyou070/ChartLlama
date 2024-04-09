@@ -671,7 +671,7 @@ class FNetForPreTraining(FNetPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, FNetForPreTraining
+        >>> from transformers_sy import AutoTokenizer, FNetForPreTraining
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/fnet-base")
@@ -821,7 +821,7 @@ class FNetForNextSentencePrediction(FNetPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, FNetForNextSentencePrediction
+        >>> from transformers_sy import AutoTokenizer, FNetForNextSentencePrediction
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/fnet-base")

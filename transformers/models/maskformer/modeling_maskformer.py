@@ -1557,7 +1557,7 @@ class MaskFormerModel(MaskFormerPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, MaskFormerModel
+        >>> from transformers_sy import AutoImageProcessor, MaskFormerModel
         >>> from PIL import Image
         >>> import requests
 
@@ -1736,7 +1736,7 @@ class MaskFormerForInstanceSegmentation(MaskFormerPreTrainedModel):
         Semantic segmentation example:
 
         ```python
-        >>> from transformers import AutoImageProcessor, MaskFormerForInstanceSegmentation
+        >>> from transformers_sy import AutoImageProcessor, MaskFormerForInstanceSegmentation
         >>> from PIL import Image
         >>> import requests
 
@@ -1769,7 +1769,7 @@ class MaskFormerForInstanceSegmentation(MaskFormerPreTrainedModel):
         Panoptic segmentation example:
 
         ```python
-        >>> from transformers import AutoImageProcessor, MaskFormerForInstanceSegmentation
+        >>> from transformers_sy import AutoImageProcessor, MaskFormerForInstanceSegmentation
         >>> from PIL import Image
         >>> import requests
 

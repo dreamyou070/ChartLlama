@@ -1145,7 +1145,7 @@ class TFLayoutLMv3Model(TFLayoutLMv3PreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, TFAutoModel
+        >>> from transformers_sy import AutoProcessor, TFAutoModel
         >>> from datasets import load_dataset
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/layoutlmv3-base", apply_ocr=False)
@@ -1264,7 +1264,7 @@ class TFLayoutLMv3ForSequenceClassification(TFLayoutLMv3PreTrainedModel, TFSeque
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, TFAutoModelForSequenceClassification
+        >>> from transformers_sy import AutoProcessor, TFAutoModelForSequenceClassification
         >>> from datasets import load_dataset
         >>> import tensorflow as tf
 
@@ -1380,7 +1380,7 @@ class TFLayoutLMv3ForTokenClassification(TFLayoutLMv3PreTrainedModel, TFTokenCla
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, TFAutoModelForTokenClassification
+        >>> from transformers_sy import AutoProcessor, TFAutoModelForTokenClassification
         >>> from datasets import load_dataset
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/layoutlmv3-base", apply_ocr=False)
@@ -1502,7 +1502,7 @@ class TFLayoutLMv3ForQuestionAnswering(TFLayoutLMv3PreTrainedModel, TFQuestionAn
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, TFAutoModelForQuestionAnswering
+        >>> from transformers_sy import AutoProcessor, TFAutoModelForQuestionAnswering
         >>> from datasets import load_dataset
         >>> import tensorflow as tf
 

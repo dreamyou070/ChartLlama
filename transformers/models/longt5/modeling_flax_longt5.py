@@ -1826,7 +1826,7 @@ class FlaxLongT5PreTrainedModel(FlaxPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, FlaxLongT5ForConditionalGeneration
+        >>> from transformers_sy import AutoTokenizer, FlaxLongT5ForConditionalGeneration
 
         >>> tokenizer = AutoTokenizer.from_pretrained("t5-base")
         >>> model = FlaxLongT5ForConditionalGeneration.from_pretrained("google/long-t5-local-base")
@@ -1887,7 +1887,7 @@ class FlaxLongT5PreTrainedModel(FlaxPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, FlaxLongT5ForConditionalGeneration
+        >>> from transformers_sy import AutoTokenizer, FlaxLongT5ForConditionalGeneration
         >>> import jax.numpy as jnp
 
         >>> tokenizer = AutoTokenizer.from_pretrained("t5-base")
@@ -2275,7 +2275,7 @@ class FlaxLongT5ForConditionalGeneration(FlaxLongT5PreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, FlaxLongT5ForConditionalGeneration
+        >>> from transformers_sy import AutoTokenizer, FlaxLongT5ForConditionalGeneration
         >>> import jax.numpy as jnp
 
         >>> tokenizer = AutoTokenizer.from_pretrained("t5-base")

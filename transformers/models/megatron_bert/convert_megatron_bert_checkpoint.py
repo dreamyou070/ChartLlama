@@ -39,7 +39,7 @@ import zipfile
 
 import torch
 
-from transformers import MegatronBertConfig
+from transformers_sy import MegatronBertConfig
 
 
 ####################################################################################################

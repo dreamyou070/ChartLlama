@@ -23,7 +23,7 @@ import fairseq
 import torch
 from fairseq.data import Dictionary
 
-from transformers import (
+from transformers_sy import (
     HubertConfig,
     HubertForCTC,
     HubertModel,

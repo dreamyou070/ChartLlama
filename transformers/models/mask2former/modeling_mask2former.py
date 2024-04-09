@@ -2233,7 +2233,7 @@ class Mask2FormerModel(Mask2FormerPreTrainedModel):
         >>> import torch
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoImageProcessor, Mask2FormerModel
+        >>> from transformers_sy import AutoImageProcessor, Mask2FormerModel
 
         >>> # load image
         >>> url = "http://images.cocodataset.org/val2017/000000039769.jpg"
@@ -2389,7 +2389,7 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
         Instance segmentation example:
 
         ```python
-        >>> from transformers import AutoImageProcessor, Mask2FormerForUniversalSegmentation
+        >>> from transformers_sy import AutoImageProcessor, Mask2FormerForUniversalSegmentation
         >>> from PIL import Image
         >>> import requests
         >>> import torch
@@ -2422,7 +2422,7 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
 
         Semantic segmentation example:
         ```python
-        >>> from transformers import AutoImageProcessor, Mask2FormerForUniversalSegmentation
+        >>> from transformers_sy import AutoImageProcessor, Mask2FormerForUniversalSegmentation
         >>> from PIL import Image
         >>> import requests
         >>> import torch
@@ -2456,7 +2456,7 @@ class Mask2FormerForUniversalSegmentation(Mask2FormerPreTrainedModel):
         Panoptic segmentation example:
 
         ```python
-        >>> from transformers import AutoImageProcessor, Mask2FormerForUniversalSegmentation
+        >>> from transformers_sy import AutoImageProcessor, Mask2FormerForUniversalSegmentation
         >>> from PIL import Image
         >>> import requests
         >>> import torch

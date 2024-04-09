@@ -16,8 +16,8 @@
 
 import argparse
 
-from transformers import ConvBertConfig, ConvBertModel, TFConvBertModel, load_tf_weights_in_convbert
-from transformers.utils import logging
+from transformers_sy import ConvBertConfig, ConvBertModel, TFConvBertModel, load_tf_weights_in_convbert
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

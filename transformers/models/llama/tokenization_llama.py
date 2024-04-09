@@ -30,7 +30,7 @@ from ...utils import logging
 
 
 if TYPE_CHECKING:
-    from transformers.pipelines.conversational import Conversation
+    from transformers_sy.pipelines.conversational import Conversation
 
 logger = logging.get_logger(__name__)
 
@@ -76,7 +76,7 @@ class LlamaTokenizer(PreTrainedTokenizer):
 
             - `legacy=True`:
             ```python
-            >>> from transformers import T5Tokenizer
+            >>> from transformers_sy import T5Tokenizer
 
             >>> tokenizer = T5Tokenizer.from_pretrained("t5-base", legacy=True)
             >>> tokenizer.encode("Hello <extra_id_0>.")
@@ -84,7 +84,7 @@ class LlamaTokenizer(PreTrainedTokenizer):
             ```
             - `legacy=False`:
             ```python
-            >>> from transformers import T5Tokenizer
+            >>> from transformers_sy import T5Tokenizer
 
             >>> tokenizer = T5Tokenizer.from_pretrained("t5-base", legacy=False)
             >>> tokenizer.encode("Hello <extra_id_0>.")  # the extra space `[3]` is no longer here
@@ -343,7 +343,7 @@ class LlamaTokenizer(PreTrainedTokenizer):
 
         If you want to use your own system prompt, make sure to use both `B_SYS` and `E_SYS` use the following:
         ```python
-        >>> from transformers import Conversation
+        >>> from transformers_sy import Conversation
 
         >>> Conversation(
         ...     "<<SYS>>\n Only answer with emojis, and charades\n<</SYS>>\n\nHow can I build a house in 10 septs?"

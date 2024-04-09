@@ -54,7 +54,7 @@ logger = logging.get_logger(__name__)
 
 
 if TYPE_CHECKING:
-    from transformers import MaskFormerForInstanceSegmentationOutput
+    from transformers_sy import MaskFormerForInstanceSegmentationOutput
 
 
 if is_torch_available():

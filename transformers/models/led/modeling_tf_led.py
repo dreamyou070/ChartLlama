@@ -2389,7 +2389,7 @@ class TFLEDForConditionalGeneration(TFLEDPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, TFLEDForConditionalGeneration
+        >>> from transformers_sy import AutoTokenizer, TFLEDForConditionalGeneration
         >>> import tensorflow as tf
 
         >>> mname = "allenai/led-base-16384"

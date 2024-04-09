@@ -75,7 +75,7 @@ class ASTConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import ASTConfig, ASTModel
+    >>> from transformers_sy import ASTConfig, ASTModel
 
     >>> # Initializing a AST MIT/ast-finetuned-audioset-10-10-0.4593 style configuration
     >>> configuration = ASTConfig()

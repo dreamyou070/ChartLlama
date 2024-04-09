@@ -299,7 +299,7 @@ class AutoFeatureExtractor:
         Examples:
 
         ```python
-        >>> from transformers import AutoFeatureExtractor
+        >>> from transformers_sy import AutoFeatureExtractor
 
         >>> # Download feature extractor from huggingface.co and cache.
         >>> feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/wav2vec2-base-960h")

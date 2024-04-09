@@ -91,7 +91,7 @@ class GPTNeoConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import GPTNeoConfig, GPTNeoModel
+    >>> from transformers_sy import GPTNeoConfig, GPTNeoModel
 
     >>> # Initializing a GPTNeo EleutherAI/gpt-neo-1.3B style configuration
     >>> configuration = GPTNeoConfig()

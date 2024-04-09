@@ -99,7 +99,7 @@ class XSoftmax(torch.autograd.Function):
 
     ```python
     >>> import torch
-    >>> from transformers.models.deberta.modeling_deberta import XSoftmax
+    >>> from transformers_sy.models.deberta.modeling_deberta import XSoftmax
 
     >>> # Make a tensor
     >>> x = torch.randn([4, 20, 100])

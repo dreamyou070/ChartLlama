@@ -1169,7 +1169,7 @@ class BlenderbotModel(BlenderbotPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, BlenderbotModel
+        >>> from transformers_sy import AutoTokenizer, BlenderbotModel
 
         >>> model = BlenderbotModel.from_pretrained("facebook/blenderbot-400M-distill")
         >>> tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-400M-distill")
@@ -1553,7 +1553,7 @@ class BlenderbotForCausalLM(BlenderbotPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, BlenderbotForCausalLM
+        >>> from transformers_sy import AutoTokenizer, BlenderbotForCausalLM
 
         >>> tokenizer = AutoTokenizer.from_pretrained("facebook/blenderbot-400M-distill")
         >>> model = BlenderbotForCausalLM.from_pretrained(

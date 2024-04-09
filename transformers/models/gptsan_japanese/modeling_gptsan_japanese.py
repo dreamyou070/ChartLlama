@@ -1152,7 +1152,7 @@ class GPTSanJapaneseForConditionalGeneration(GPTSanJapanesePreTrainedModel):
 
         Text Generation with regular LM Model
         ```python
-        >>> from transformers import AutoModel, AutoTokenizer, trainer_utils
+        >>> from transformers_sy import AutoModel, AutoTokenizer, trainer_utils
 
         >>> device = "cuda"
         >>> model = AutoModel.from_pretrained("Tanrei/GPTSAN-japanese").to(device)
@@ -1167,7 +1167,7 @@ class GPTSanJapaneseForConditionalGeneration(GPTSanJapanesePreTrainedModel):
 
         Text Generation with Prefix-LM Model
         ```python
-        >>> from transformers import AutoModel, AutoTokenizer, trainer_utils
+        >>> from transformers_sy import AutoModel, AutoTokenizer, trainer_utils
 
         >>> device = "cuda"
         >>> model = AutoModel.from_pretrained("Tanrei/GPTSAN-japanese").to(device)
@@ -1183,7 +1183,7 @@ class GPTSanJapaneseForConditionalGeneration(GPTSanJapanesePreTrainedModel):
 
         Simultaneously Text Generation And Masked Language Model
         ```python
-        >>> from transformers import AutoModel, AutoTokenizer, trainer_utils
+        >>> from transformers_sy import AutoModel, AutoTokenizer, trainer_utils
 
         >>> device = "cuda"
         >>> model = AutoModel.from_pretrained("Tanrei/GPTSAN-japanese").to(device)

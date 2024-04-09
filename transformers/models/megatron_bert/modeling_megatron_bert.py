@@ -1067,7 +1067,7 @@ class MegatronBertForPreTraining(MegatronBertPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, MegatronBertForPreTraining
+        >>> from transformers_sy import AutoTokenizer, MegatronBertForPreTraining
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("nvidia/megatron-bert-cased-345m")
@@ -1189,7 +1189,7 @@ class MegatronBertForCausalLM(MegatronBertPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, MegatronBertForCausalLM, MegatronBertConfig
+        >>> from transformers_sy import AutoTokenizer, MegatronBertForCausalLM, MegatronBertConfig
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("nvidia/megatron-bert-cased-345m")
@@ -1410,7 +1410,7 @@ class MegatronBertForNextSentencePrediction(MegatronBertPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, MegatronBertForNextSentencePrediction
+        >>> from transformers_sy import AutoTokenizer, MegatronBertForNextSentencePrediction
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("nvidia/megatron-bert-cased-345m")

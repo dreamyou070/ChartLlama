@@ -1533,7 +1533,7 @@ class ConditionalDetrModel(ConditionalDetrPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, AutoModel
+        >>> from transformers_sy import AutoImageProcessor, AutoModel
         >>> from PIL import Image
         >>> import requests
 
@@ -1701,7 +1701,7 @@ class ConditionalDetrForObjectDetection(ConditionalDetrPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, AutoModelForObjectDetection
+        >>> from transformers_sy import AutoImageProcessor, AutoModelForObjectDetection
         >>> from PIL import Image
         >>> import requests
 
@@ -1893,12 +1893,12 @@ class ConditionalDetrForSegmentation(ConditionalDetrPreTrainedModel):
         >>> import torch
         >>> import numpy
 
-        >>> from transformers import (
+        >>> from transformers_sy import (
         ...     AutoImageProcessor,
         ...     ConditionalDetrConfig,
         ...     ConditionalDetrForSegmentation,
         ... )
-        >>> from transformers.image_transforms import rgb_to_id
+        >>> from transformers_sy.image_transforms import rgb_to_id
 
         >>> url = "http://images.cocodataset.org/val2017/000000039769.jpg"
         >>> image = Image.open(requests.get(url, stream=True).raw)

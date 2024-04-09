@@ -80,7 +80,7 @@ class LukeConfig(PretrainedConfig):
     Examples:
 
     ```python
-    >>> from transformers import LukeConfig, LukeModel
+    >>> from transformers_sy import LukeConfig, LukeModel
 
     >>> # Initializing a LUKE configuration
     >>> configuration = LukeConfig()

@@ -93,7 +93,7 @@ class MobileBertConfig(PretrainedConfig):
     Examples:
 
     ```python
-    >>> from transformers import MobileBertConfig, MobileBertModel
+    >>> from transformers_sy import MobileBertConfig, MobileBertModel
 
     >>> # Initializing a MobileBERT configuration
     >>> configuration = MobileBertConfig()

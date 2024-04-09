@@ -24,7 +24,7 @@ from ...utils.versions import require_version
 
 
 if TYPE_CHECKING:
-    from transformers.pipelines.conversational import Conversation
+    from transformers_sy.pipelines.conversational import Conversation
 
 require_version("tokenizers>=0.13.3")
 
@@ -199,7 +199,7 @@ class LlamaTokenizerFast(PreTrainedTokenizerFast):
 
         If you want to use your own system prompt, make sure to use both `B_SYS` and `E_SYS` use the following:
         ```python
-        >>> from transformers import Conversation
+        >>> from transformers_sy import Conversation
 
         >>> Conversation(
         ...     "<<SYS>>\n Only answer with emojis, and charades\n<</SYS>>\n\nHow can I build a house in 10 septs?"

@@ -335,7 +335,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         Examples:
 
         ```python
-        >>> from transformers import FlaxBertModel
+        >>> from transformers_sy import FlaxBertModel
 
         >>> # load model
         >>> model = FlaxBertModel.from_pretrained("bert-base-cased")
@@ -371,7 +371,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         Examples:
 
         ```python
-        >>> from transformers import FlaxBertModel
+        >>> from transformers_sy import FlaxBertModel
 
         >>> # Download model and configuration from huggingface.co
         >>> model = FlaxBertModel.from_pretrained("bert-base-cased")
@@ -401,7 +401,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         Examples:
 
         ```python
-        >>> from transformers import FlaxBertModel
+        >>> from transformers_sy import FlaxBertModel
 
         >>> # load model
         >>> model = FlaxBertModel.from_pretrained("bert-base-cased")
@@ -601,7 +601,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         Examples:
 
         ```python
-        >>> from transformers import BertConfig, FlaxBertModel
+        >>> from transformers_sy import BertConfig, FlaxBertModel
 
         >>> # Download model and configuration from huggingface.co and cache.
         >>> model = FlaxBertModel.from_pretrained("bert-base-cased")
@@ -1140,7 +1140,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
         if not isinstance(auto_class, str):
             auto_class = auto_class.__name__
 
-        import transformers.models.auto as auto_module
+        import transformers_sy.models.auto as auto_module
 
         if not hasattr(auto_module, auto_class):
             raise ValueError(f"{auto_class} is not a valid auto class.")

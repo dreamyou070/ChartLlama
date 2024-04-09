@@ -455,7 +455,7 @@ class GenerationConfig(PushToHubMixin):
         Examples:
 
         ```python
-        >>> from transformers import GenerationConfig
+        >>> from transformers_sy import GenerationConfig
 
         >>> # Download configuration from huggingface.co and cache.
         >>> generation_config = GenerationConfig.from_pretrained("gpt2")

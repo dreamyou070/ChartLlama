@@ -305,7 +305,7 @@ class AutoImageProcessor:
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor
+        >>> from transformers_sy import AutoImageProcessor
 
         >>> # Download image processor from huggingface.co and cache.
         >>> image_processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")

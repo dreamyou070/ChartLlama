@@ -30,7 +30,7 @@ import torch
 from lavis.models import load_model_and_preprocess
 from PIL import Image
 
-from transformers import (
+from transformers_sy import (
     AutoTokenizer,
     BlipImageProcessor,
     InstructBlipConfig,
@@ -43,7 +43,7 @@ from transformers import (
     T5Config,
     T5TokenizerFast,
 )
-from transformers.utils.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
+from transformers_sy.utils.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
 
 
 def load_demo_image():

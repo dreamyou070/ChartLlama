@@ -1,12 +1,12 @@
 import argparse
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers_sy import AutoTokenizer, AutoModelForCausalLM
 import torch
 import os
 import sys
 import json
 from llava.conversation import conv_templates, SeparatorStyle
 from llava.utils import disable_torch_init
-from transformers import CLIPVisionModel, CLIPImageProcessor, StoppingCriteria
+from transformers_sy import CLIPVisionModel, CLIPImageProcessor, StoppingCriteria
 from llava.model import *
 from llava.model.utils import KeywordsStoppingCriteria
 from llava.utils import disable_torch_init

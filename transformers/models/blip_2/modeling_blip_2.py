@@ -1270,7 +1270,7 @@ class Blip2Model(Blip2PreTrainedModel):
         Examples:
         ```python
         >>> import torch
-        >>> from transformers import AutoTokenizer, Blip2Model
+        >>> from transformers_sy import AutoTokenizer, Blip2Model
 
         >>> device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -1331,7 +1331,7 @@ class Blip2Model(Blip2PreTrainedModel):
         >>> import torch
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, Blip2Model
+        >>> from transformers_sy import AutoProcessor, Blip2Model
 
         >>> device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -1379,7 +1379,7 @@ class Blip2Model(Blip2PreTrainedModel):
         >>> import torch
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import Blip2Processor, Blip2Model
+        >>> from transformers_sy import Blip2Processor, Blip2Model
 
         >>> device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -1444,7 +1444,7 @@ class Blip2Model(Blip2PreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import Blip2Processor, Blip2Model
+        >>> from transformers_sy import Blip2Processor, Blip2Model
         >>> import torch
 
         >>> device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -1653,7 +1653,7 @@ class Blip2ForConditionalGeneration(Blip2PreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import Blip2Processor, Blip2ForConditionalGeneration
+        >>> from transformers_sy import Blip2Processor, Blip2ForConditionalGeneration
         >>> import torch
 
         >>> device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -1680,7 +1680,7 @@ class Blip2ForConditionalGeneration(Blip2PreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import Blip2Processor, Blip2ForConditionalGeneration
+        >>> from transformers_sy import Blip2Processor, Blip2ForConditionalGeneration
         >>> import torch
 
         >>> device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -37,8 +37,8 @@ import accelerate
 from accelerate.optimizer import AcceleratedOptimizer
 from accelerate.utils import convert_outputs_to_fp32
 
-import transformers
-from transformers.trainer_utils import enable_full_determinism, set_seed
+import transformers_sy
+from transformers_sy.trainer_utils import enable_full_determinism, set_seed
 
 from data_utils.data_utils_ppo import QueryResponseDataset
 import data_utils.common_utils as utils
@@ -116,7 +116,7 @@ class RLTrainer(object):
         train_dataset: QueryResponseDataset,
         eval_dataset: QueryResponseDataset,
         data_collator: Callable,
-        tokenizer: transformers.PreTrainedTokenizer,
+        tokenizer: transformers_sy.PreTrainedTokenizer,
         policy: nn.Module,
         accelerator: AlpacaAccelerator,
         ref_policy: Optional[nn.Module] = None,

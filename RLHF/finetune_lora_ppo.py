@@ -15,19 +15,19 @@ import torch.distributed as dist
 import accelerate
 from accelerate import DistributedDataParallelKwargs
 
-import transformers
-from transformers import set_seed
+import transformers_sy
+from transformers_sy import set_seed
 
 try:
-    from transformers import LlamaTokenizerFast as LlamaTokenizer
+    from transformers_sy import LlamaTokenizerFast as LlamaTokenizer
 
     print("Using fast tokenizer")
 except:
-    from transformers import LlamaTokenizer
+    from transformers_sy import LlamaTokenizer
 
     print("Using slow tokenizer")
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers_sy import AutoTokenizer, AutoModelForCausalLM
 
 from data_utils.data_utils_ppo import make_rl_data_module
 from lora_utils import (
@@ -109,7 +109,7 @@ class DataArguments:
 
 
 @dataclass
-class TrainingArguments(transformers.Seq2SeqTrainingArguments):
+class TrainingArguments(transformers_sy.Seq2SeqTrainingArguments):
     cache_dir: Optional[str] = field(default=None)
     # From AlpacaFarm
     truncate_tokens: Optional[List[str]] = field(
@@ -378,7 +378,7 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
         else:
             self.save_steps_extra_list = []
 
-    def set_truncate_token_ids(self, tokenizer: transformers.PreTrainedTokenizer):
+    def set_truncate_token_ids(self, tokenizer: transformers_sy.PreTrainedTokenizer):
         """Convert truncation token to token ids.
 
         This is called in RLTrainer.
@@ -398,7 +398,7 @@ def rank0_print(*args):
 
 
 def train():
-    hfparser = transformers.HfArgumentParser(
+    hfparser = transformers_sy.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments)
     )
     (

@@ -78,7 +78,7 @@ class MgpstrConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import MgpstrConfig, MgpstrForSceneTextRecognition
+    >>> from transformers_sy import MgpstrConfig, MgpstrForSceneTextRecognition
 
     >>> # Initializing a Mgpstr mgp-str-base style configuration
     >>> configuration = MgpstrConfig()

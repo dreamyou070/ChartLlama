@@ -233,7 +233,7 @@ def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestR
 
     def _objective(trial, local_trainer, checkpoint_dir=None):
         try:
-            from transformers.utils.notebook import NotebookProgressCallback
+            from transformers_sy.utils.notebook import NotebookProgressCallback
 
             if local_trainer.pop_callback(NotebookProgressCallback):
                 local_trainer.add_callback(ProgressCallback)

@@ -815,7 +815,7 @@ class CLIPSegTextModel(CLIPSegPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, CLIPSegTextModel
+        >>> from transformers_sy import AutoTokenizer, CLIPSegTextModel
 
         >>> tokenizer = AutoTokenizer.from_pretrained("CIDAS/clipseg-rd64-refined")
         >>> model = CLIPSegTextModel.from_pretrained("CIDAS/clipseg-rd64-refined")
@@ -926,7 +926,7 @@ class CLIPSegVisionModel(CLIPSegPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, CLIPSegVisionModel
+        >>> from transformers_sy import AutoProcessor, CLIPSegVisionModel
 
         >>> processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
         >>> model = CLIPSegVisionModel.from_pretrained("CIDAS/clipseg-rd64-refined")
@@ -1002,7 +1002,7 @@ class CLIPSegModel(CLIPSegPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, CLIPSegModel
+        >>> from transformers_sy import AutoTokenizer, CLIPSegModel
 
         >>> tokenizer = AutoTokenizer.from_pretrained("CIDAS/clipseg-rd64-refined")
         >>> model = CLIPSegModel.from_pretrained("CIDAS/clipseg-rd64-refined")
@@ -1049,7 +1049,7 @@ class CLIPSegModel(CLIPSegPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, CLIPSegModel
+        >>> from transformers_sy import AutoProcessor, CLIPSegModel
 
         >>> processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
         >>> model = CLIPSegModel.from_pretrained("CIDAS/clipseg-rd64-refined")
@@ -1101,7 +1101,7 @@ class CLIPSegModel(CLIPSegPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, CLIPSegModel
+        >>> from transformers_sy import AutoProcessor, CLIPSegModel
 
         >>> processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
         >>> model = CLIPSegModel.from_pretrained("CIDAS/clipseg-rd64-refined")
@@ -1408,7 +1408,7 @@ class CLIPSegForImageSegmentation(CLIPSegPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, CLIPSegForImageSegmentation
+        >>> from transformers_sy import AutoProcessor, CLIPSegForImageSegmentation
         >>> from PIL import Image
         >>> import requests
 

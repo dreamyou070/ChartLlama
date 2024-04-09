@@ -854,7 +854,7 @@ class MarkupLMModel(MarkupLMPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, MarkupLMModel
+        >>> from transformers_sy import AutoProcessor, MarkupLMModel
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/markuplm-base")
         >>> model = MarkupLMModel.from_pretrained("microsoft/markuplm-base")
@@ -1016,7 +1016,7 @@ class MarkupLMForQuestionAnswering(MarkupLMPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, MarkupLMForQuestionAnswering
+        >>> from transformers_sy import AutoProcessor, MarkupLMForQuestionAnswering
         >>> import torch
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/markuplm-base-finetuned-websrc")
@@ -1133,7 +1133,7 @@ class MarkupLMForTokenClassification(MarkupLMPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, AutoModelForTokenClassification
+        >>> from transformers_sy import AutoProcessor, AutoModelForTokenClassification
         >>> import torch
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/markuplm-base")
@@ -1242,7 +1242,7 @@ class MarkupLMForSequenceClassification(MarkupLMPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, AutoModelForSequenceClassification
+        >>> from transformers_sy import AutoProcessor, AutoModelForSequenceClassification
         >>> import torch
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/markuplm-base")

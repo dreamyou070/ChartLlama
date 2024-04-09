@@ -2315,7 +2315,7 @@ class BigBirdForPreTraining(BigBirdPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, BigBirdForPreTraining
+        >>> from transformers_sy import AutoTokenizer, BigBirdForPreTraining
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/bigbird-roberta-base")
@@ -2420,7 +2420,7 @@ class BigBirdForMaskedLM(BigBirdPreTrainedModel):
 
         ```python
         >>> import torch
-        >>> from transformers import AutoTokenizer, BigBirdForMaskedLM
+        >>> from transformers_sy import AutoTokenizer, BigBirdForMaskedLM
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/bigbird-roberta-base")
@@ -2711,7 +2711,7 @@ class BigBirdForSequenceClassification(BigBirdPreTrainedModel):
 
         ```python
         >>> import torch
-        >>> from transformers import AutoTokenizer, BigBirdForSequenceClassification
+        >>> from transformers_sy import AutoTokenizer, BigBirdForSequenceClassification
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("l-yohai/bigbird-roberta-base-mnli")
@@ -3040,7 +3040,7 @@ class BigBirdForQuestionAnswering(BigBirdPreTrainedModel):
 
         ```python
         >>> import torch
-        >>> from transformers import AutoTokenizer, BigBirdForQuestionAnswering
+        >>> from transformers_sy import AutoTokenizer, BigBirdForQuestionAnswering
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/bigbird-roberta-base")

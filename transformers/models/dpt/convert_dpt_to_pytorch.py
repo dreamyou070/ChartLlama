@@ -24,8 +24,8 @@ import torch
 from huggingface_hub import cached_download, hf_hub_url
 from PIL import Image
 
-from transformers import DPTConfig, DPTForDepthEstimation, DPTForSemanticSegmentation, DPTImageProcessor
-from transformers.utils import logging
+from transformers_sy import DPTConfig, DPTForDepthEstimation, DPTForSemanticSegmentation, DPTImageProcessor
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

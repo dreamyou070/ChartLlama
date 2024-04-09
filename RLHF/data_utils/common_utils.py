@@ -32,7 +32,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-import transformers
+import transformers_sy
 from llava import conversation as conversation_lib
 from llava.constants import (
     IGNORE_INDEX,
@@ -237,7 +237,7 @@ def preprocess_multimodal(
 
 def preprocess_llama_2(
     sources,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     has_image: bool = False,
     mask_target: bool = True,
     query_len: Optional[int] = None,
@@ -349,7 +349,7 @@ def preprocess_llama_2(
 
 def preprocess_v1(
     sources,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     has_image: bool = False,
     mask_target: bool = True,
     query_len: Optional[int] = None,
@@ -491,7 +491,7 @@ def preprocess_v1(
 
 def preprocess(
     sources: Sequence[str],
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     has_image: bool = False,
     mask_target: bool = True,
     query_len: Optional[int] = None,

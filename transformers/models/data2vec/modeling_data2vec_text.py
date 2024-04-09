@@ -944,7 +944,7 @@ class Data2VecTextForCausalLM(Data2VecTextPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, Data2VecTextForCausalLM, Data2VecTextConfig
+        >>> from transformers_sy import AutoTokenizer, Data2VecTextForCausalLM, Data2VecTextConfig
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("facebook/data2vec-text-base")

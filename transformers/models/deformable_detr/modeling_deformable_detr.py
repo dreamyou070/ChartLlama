@@ -62,7 +62,7 @@ else:
     MultiScaleDeformableAttention = None
 
 if is_vision_available():
-    from transformers.image_transforms import center_to_corners_format
+    from transformers_sy.image_transforms import center_to_corners_format
 
 
 class MultiScaleDeformableAttentionFunction(Function):
@@ -1633,7 +1633,7 @@ class DeformableDetrModel(DeformableDetrPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, DeformableDetrModel
+        >>> from transformers_sy import AutoImageProcessor, DeformableDetrModel
         >>> from PIL import Image
         >>> import requests
 
@@ -1900,7 +1900,7 @@ class DeformableDetrForObjectDetection(DeformableDetrPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, DeformableDetrForObjectDetection
+        >>> from transformers_sy import AutoImageProcessor, DeformableDetrForObjectDetection
         >>> from PIL import Image
         >>> import requests
 

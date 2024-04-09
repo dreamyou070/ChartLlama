@@ -26,7 +26,7 @@ from .tokenization_deberta import DebertaTokenizer
 
 
 if TYPE_CHECKING:
-    from transformers.pipelines.conversational import Conversation
+    from transformers_sy.pipelines.conversational import Conversation
 
 
 logger = logging.get_logger(__name__)
@@ -80,7 +80,7 @@ class DebertaTokenizerFast(PreTrainedTokenizerFast):
     be encoded differently whether it is at the beginning of the sentence (without space) or not:
 
     ```python
-    >>> from transformers import DebertaTokenizerFast
+    >>> from transformers_sy import DebertaTokenizerFast
 
     >>> tokenizer = DebertaTokenizerFast.from_pretrained("microsoft/deberta-base")
     >>> tokenizer("Hello world")["input_ids"]

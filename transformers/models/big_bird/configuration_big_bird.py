@@ -93,7 +93,7 @@ class BigBirdConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import BigBirdConfig, BigBirdModel
+    >>> from transformers_sy import BigBirdConfig, BigBirdModel
 
     >>> # Initializing a BigBird google/bigbird-roberta-base style configuration
     >>> configuration = BigBirdConfig()

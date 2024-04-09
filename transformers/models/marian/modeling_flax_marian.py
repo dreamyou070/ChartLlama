@@ -979,7 +979,7 @@ class FlaxMarianPreTrainedModel(FlaxPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, FlaxMarianMTModel
+        >>> from transformers_sy import AutoTokenizer, FlaxMarianMTModel
 
         >>> tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
         >>> model = FlaxMarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-de")
@@ -1047,7 +1047,7 @@ class FlaxMarianPreTrainedModel(FlaxPreTrainedModel):
 
         ```python
         >>> import jax.numpy as jnp
-        >>> from transformers import AutoTokenizer, FlaxMarianMTModel
+        >>> from transformers_sy import AutoTokenizer, FlaxMarianMTModel
 
         >>> tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
         >>> model = FlaxMarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-de")
@@ -1314,7 +1314,7 @@ class FlaxMarianMTModel(FlaxMarianPreTrainedModel):
 
         ```python
         >>> import jax.numpy as jnp
-        >>> from transformers import AutoTokenizer, FlaxMarianMTModel
+        >>> from transformers_sy import AutoTokenizer, FlaxMarianMTModel
 
         >>> model = FlaxMarianMTModel.from_pretrained("Helsinki-NLP/opus-mt-en-de")
         >>> tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")

@@ -89,7 +89,7 @@ class LlamaConfig(PretrainedConfig):
         Example:
 
     ```python
-    >>> from transformers import LlamaModel, LlamaConfig
+    >>> from transformers_sy import LlamaModel, LlamaConfig
 
     >>> # Initializing a LLaMA llama-7b style configuration
     >>> configuration = LlamaConfig()

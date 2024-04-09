@@ -739,7 +739,7 @@ class LiltModel(LiltPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, AutoModel
+        >>> from transformers_sy import AutoTokenizer, AutoModel
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("SCUT-DLVCLab/lilt-roberta-en-base")
@@ -877,7 +877,7 @@ class LiltForSequenceClassification(LiltPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, AutoModelForSequenceClassification
+        >>> from transformers_sy import AutoTokenizer, AutoModelForSequenceClassification
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("SCUT-DLVCLab/lilt-roberta-en-base")
@@ -996,7 +996,7 @@ class LiltForTokenClassification(LiltPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, AutoModelForTokenClassification
+        >>> from transformers_sy import AutoTokenizer, AutoModelForTokenClassification
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("SCUT-DLVCLab/lilt-roberta-en-base")
@@ -1125,7 +1125,7 @@ class LiltForQuestionAnswering(LiltPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, AutoModelForQuestionAnswering
+        >>> from transformers_sy import AutoTokenizer, AutoModelForQuestionAnswering
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("SCUT-DLVCLab/lilt-roberta-en-base")

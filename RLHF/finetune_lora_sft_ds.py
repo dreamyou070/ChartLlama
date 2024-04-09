@@ -10,23 +10,23 @@ import logging
 import pathlib
 
 import torch
-import transformers
+import transformers_sy
 import argparse
-from transformers import (
+from transformers_sy import (
     set_seed,
     Trainer,
 )
 
 try:
-    from transformers import LlamaTokenizerFast as LlamaTokenizer
+    from transformers_sy import LlamaTokenizerFast as LlamaTokenizer
 
     print("Using fast tokenizer")
 except:
-    from transformers import LlamaTokenizer
+    from transformers_sy import LlamaTokenizer
 
     print("Using slow tokenizer")
 
-from transformers import AutoTokenizer
+from transformers_sy import AutoTokenizer
 
 from lora_utils import (
     print_trainable_parameters,
@@ -123,7 +123,7 @@ class DataArguments:
 
 
 @dataclass
-class TrainingArguments(transformers.Seq2SeqTrainingArguments):
+class TrainingArguments(transformers_sy.Seq2SeqTrainingArguments):
     cache_dir: Optional[str] = field(default=None)
     train_on_source: Optional[bool] = field(
         default=False,
@@ -327,7 +327,7 @@ def get_peft_state_non_lora_maybe_zero_3(named_params, require_grad_only=True):
     return to_return
 
 
-def safe_save_model_for_hf_trainer(trainer: transformers.Trainer, output_dir: str):
+def safe_save_model_for_hf_trainer(trainer: transformers_sy.Trainer, output_dir: str):
     """Collects the state dict and dump to disk."""
 
     if trainer.deepspeed:
@@ -349,7 +349,7 @@ def rank0_print(*args):
 
 
 def train():
-    hfparser = transformers.HfArgumentParser(
+    hfparser = transformers_sy.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments, GenerationArguments)
     )
     (
@@ -359,7 +359,7 @@ def train():
         generation_args,
         extra_args,
     ) = hfparser.parse_args_into_dataclasses(return_remaining_strings=True)
-    training_args.generation_config = transformers.GenerationConfig(
+    training_args.generation_config = transformers_sy.GenerationConfig(
         **vars(generation_args)
     )
     args = argparse.Namespace(

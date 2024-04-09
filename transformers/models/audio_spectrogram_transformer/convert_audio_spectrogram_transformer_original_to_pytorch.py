@@ -24,8 +24,8 @@ import torchaudio
 from datasets import load_dataset
 from huggingface_hub import hf_hub_download
 
-from transformers import ASTConfig, ASTFeatureExtractor, ASTForAudioClassification
-from transformers.utils import logging
+from transformers_sy import ASTConfig, ASTFeatureExtractor, ASTForAudioClassification
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

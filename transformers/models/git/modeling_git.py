@@ -1022,7 +1022,7 @@ class GitVisionModel(GitPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, GitVisionModel
+        >>> from transformers_sy import AutoProcessor, GitVisionModel
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/git-base")
         >>> model = GitVisionModel.from_pretrained("microsoft/git-base")
@@ -1185,7 +1185,7 @@ class GitModel(GitPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, AutoModel
+        >>> from transformers_sy import AutoProcessor, AutoModel
         >>> import requests
         >>> from PIL import Image
 
@@ -1381,7 +1381,7 @@ class GitForCausalLM(GitPreTrainedModel):
         Image captioning example:
 
         ```python
-        >>> from transformers import AutoProcessor, AutoModelForCausalLM
+        >>> from transformers_sy import AutoProcessor, AutoModelForCausalLM
         >>> import requests
         >>> from PIL import Image
 
@@ -1402,7 +1402,7 @@ class GitForCausalLM(GitPreTrainedModel):
         Visual question answering (VQA) example:
 
         ```python
-        >>> from transformers import AutoProcessor, AutoModelForCausalLM
+        >>> from transformers_sy import AutoProcessor, AutoModelForCausalLM
         >>> from huggingface_hub import hf_hub_download
         >>> from PIL import Image
 
@@ -1432,7 +1432,7 @@ class GitForCausalLM(GitPreTrainedModel):
         >>> import numpy as np
         >>> from PIL import Image
         >>> from huggingface_hub import hf_hub_download
-        >>> from transformers import AutoProcessor, AutoModelForCausalLM
+        >>> from transformers_sy import AutoProcessor, AutoModelForCausalLM
 
         >>> processor = AutoProcessor.from_pretrained("microsoft/git-base-vatex")
         >>> model = AutoModelForCausalLM.from_pretrained("microsoft/git-base-vatex")

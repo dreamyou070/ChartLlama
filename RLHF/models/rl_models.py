@@ -25,7 +25,7 @@ import logging
 from typing import Dict, Optional
 
 import torch
-import transformers
+import transformers_sy
 from torch import Tensor, nn
 
 from data_utils.common_utils import right_pad, compute_logprobs
@@ -39,8 +39,8 @@ class Policy(nn.Module, abc.ABC):
     def __init__(
         self,
         args,
-        base_model: transformers.PreTrainedModel,
-        base_tokenizer: transformers.PreTrainedTokenizer,
+        base_model: transformers_sy.PreTrainedModel,
+        base_tokenizer: transformers_sy.PreTrainedTokenizer,
         adapter_name: Optional[str] = None,
     ):
         super().__init__()
@@ -193,8 +193,8 @@ class Value(nn.Module, abc.ABC):
     def __init__(
         self,
         args,
-        base_model: transformers.PreTrainedModel,
-        base_tokenizer: transformers.PreTrainedTokenizer,
+        base_model: transformers_sy.PreTrainedModel,
+        base_tokenizer: transformers_sy.PreTrainedTokenizer,
         adapter_name: Optional[str] = None,
     ):
         super().__init__()
@@ -346,8 +346,8 @@ class ActorCritic(nn.Module):
 
 def make_policy_with_base_model(
     args,
-    base_model: transformers.PreTrainedModel,
-    base_tokenizer: transformers.PreTrainedTokenizer,
+    base_model: transformers_sy.PreTrainedModel,
+    base_tokenizer: transformers_sy.PreTrainedTokenizer,
     adapter_name: Optional[str] = "default",
 ) -> Policy:
     if base_model.config.is_encoder_decoder:
@@ -360,8 +360,8 @@ def make_policy_with_base_model(
 
 def make_value_with_base_model(
     args,
-    base_model: transformers.PreTrainedModel,
-    base_tokenizer: transformers.PreTrainedTokenizer,
+    base_model: transformers_sy.PreTrainedModel,
+    base_tokenizer: transformers_sy.PreTrainedTokenizer,
     adapter_name: Optional[str] = "default",
 ) -> Value:
     if base_model.config.is_encoder_decoder:

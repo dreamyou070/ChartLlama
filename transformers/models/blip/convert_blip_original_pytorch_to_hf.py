@@ -27,7 +27,7 @@ from PIL import Image
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
 
-from transformers import (
+from transformers_sy import (
     BertTokenizer,
     BlipConfig,
     BlipForConditionalGeneration,

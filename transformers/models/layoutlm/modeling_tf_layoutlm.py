@@ -942,7 +942,7 @@ class TFLayoutLMModel(TFLayoutLMPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, TFLayoutLMModel
+        >>> from transformers_sy import AutoTokenizer, TFLayoutLMModel
         >>> import tensorflow as tf
 
         >>> tokenizer = AutoTokenizer.from_pretrained("microsoft/layoutlm-base-uncased")
@@ -1045,7 +1045,7 @@ class TFLayoutLMForMaskedLM(TFLayoutLMPreTrainedModel, TFMaskedLanguageModelingL
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, TFLayoutLMForMaskedLM
+        >>> from transformers_sy import AutoTokenizer, TFLayoutLMForMaskedLM
         >>> import tensorflow as tf
 
         >>> tokenizer = AutoTokenizer.from_pretrained("microsoft/layoutlm-base-uncased")
@@ -1162,7 +1162,7 @@ class TFLayoutLMForSequenceClassification(TFLayoutLMPreTrainedModel, TFSequenceC
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, TFLayoutLMForSequenceClassification
+        >>> from transformers_sy import AutoTokenizer, TFLayoutLMForSequenceClassification
         >>> import tensorflow as tf
 
         >>> tokenizer = AutoTokenizer.from_pretrained("microsoft/layoutlm-base-uncased")
@@ -1285,7 +1285,7 @@ class TFLayoutLMForTokenClassification(TFLayoutLMPreTrainedModel, TFTokenClassif
 
         ```python
         >>> import tensorflow as tf
-        >>> from transformers import AutoTokenizer, TFLayoutLMForTokenClassification
+        >>> from transformers_sy import AutoTokenizer, TFLayoutLMForTokenClassification
 
         >>> tokenizer = AutoTokenizer.from_pretrained("microsoft/layoutlm-base-uncased")
         >>> model = TFLayoutLMForTokenClassification.from_pretrained("microsoft/layoutlm-base-uncased")
@@ -1412,7 +1412,7 @@ class TFLayoutLMForQuestionAnswering(TFLayoutLMPreTrainedModel, TFQuestionAnswer
 
         ```python
         >>> import tensorflow as tf
-        >>> from transformers import AutoTokenizer, TFLayoutLMForQuestionAnswering
+        >>> from transformers_sy import AutoTokenizer, TFLayoutLMForQuestionAnswering
         >>> from datasets import load_dataset
 
         >>> tokenizer = AutoTokenizer.from_pretrained("impira/layoutlm-document-qa", add_prefix_space=True)

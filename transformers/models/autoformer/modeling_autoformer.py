@@ -1701,7 +1701,7 @@ class AutoformerModel(AutoformerPreTrainedModel):
         ```python
         >>> from huggingface_hub import hf_hub_download
         >>> import torch
-        >>> from transformers import AutoformerModel
+        >>> from transformers_sy import AutoformerModel
 
         >>> file = hf_hub_download(
         ...     repo_id="hf-internal-testing/tourism-monthly-batch", filename="train-batch.pt", repo_type="dataset"
@@ -1904,7 +1904,7 @@ class AutoformerForPrediction(AutoformerPreTrainedModel):
         ```python
         >>> from huggingface_hub import hf_hub_download
         >>> import torch
-        >>> from transformers import AutoformerForPrediction
+        >>> from transformers_sy import AutoformerForPrediction
 
         >>> file = hf_hub_download(
         ...     repo_id="hf-internal-testing/tourism-monthly-batch", filename="train-batch.pt", repo_type="dataset"

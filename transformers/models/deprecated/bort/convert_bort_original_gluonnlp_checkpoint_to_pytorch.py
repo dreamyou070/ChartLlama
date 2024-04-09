@@ -29,15 +29,15 @@ from gluonnlp.vocab import Vocab
 from packaging import version
 from torch import nn
 
-from transformers import BertConfig, BertForMaskedLM, BertModel, RobertaTokenizer
-from transformers.models.bert.modeling_bert import (
+from transformers_sy import BertConfig, BertForMaskedLM, BertModel, RobertaTokenizer
+from transformers_sy.models.bert.modeling_bert import (
     BertIntermediate,
     BertLayer,
     BertOutput,
     BertSelfAttention,
     BertSelfOutput,
 )
-from transformers.utils import logging
+from transformers_sy.utils import logging
 
 
 if version.parse(nlp.__version__) != version.parse("0.8.3"):

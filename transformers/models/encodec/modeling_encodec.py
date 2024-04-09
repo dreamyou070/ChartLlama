@@ -775,7 +775,7 @@ class EncodecModel(EncodecPreTrainedModel):
 
         ```python
         >>> from datasets import load_dataset
-        >>> from transformers import AutoProcessor, EncodecModel
+        >>> from transformers_sy import AutoProcessor, EncodecModel
 
         >>> dataset = load_dataset("ashraq/esc50")
         >>> audio_sample = dataset["train"]["audio"][0]["array"]

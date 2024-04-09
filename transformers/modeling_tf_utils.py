@@ -2603,7 +2603,7 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
         Examples:
 
         ```python
-        >>> from transformers import BertConfig, TFBertModel
+        >>> from transformers_sy import BertConfig, TFBertModel
 
         >>> # Download model and configuration from huggingface.co and cache.
         >>> model = TFBertModel.from_pretrained("bert-base-uncased")
@@ -3144,7 +3144,7 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
         if not isinstance(auto_class, str):
             auto_class = auto_class.__name__
 
-        import transformers.models.auto as auto_module
+        import transformers_sy.models.auto as auto_module
 
         if not hasattr(auto_module, auto_class):
             raise ValueError(f"{auto_class} is not a valid auto class.")

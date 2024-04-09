@@ -981,7 +981,7 @@ class MobileBertForPreTraining(MobileBertPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, MobileBertForPreTraining
+        >>> from transformers_sy import AutoTokenizer, MobileBertForPreTraining
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/mobilebert-uncased")
@@ -1170,7 +1170,7 @@ class MobileBertForNextSentencePrediction(MobileBertPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, MobileBertForNextSentencePrediction
+        >>> from transformers_sy import AutoTokenizer, MobileBertForNextSentencePrediction
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/mobilebert-uncased")

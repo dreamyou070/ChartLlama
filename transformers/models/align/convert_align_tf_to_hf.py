@@ -25,7 +25,7 @@ import torch
 from PIL import Image
 from tokenizer import Tokenizer
 
-from transformers import (
+from transformers_sy import (
     AlignConfig,
     AlignModel,
     AlignProcessor,
@@ -34,7 +34,7 @@ from transformers import (
     EfficientNetConfig,
     EfficientNetImageProcessor,
 )
-from transformers.utils import logging
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

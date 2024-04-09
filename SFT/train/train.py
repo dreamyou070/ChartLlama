@@ -25,7 +25,7 @@ import random
 
 import torch
 
-import transformers
+import transformers_sy
 
 from torch.utils.data import Dataset
 from llava_trainer import LLaVATrainer
@@ -74,7 +74,7 @@ class DataArguments:
     mimicit_dataset: bool = False
 
 @dataclass
-class TrainingArguments(transformers.TrainingArguments):
+class TrainingArguments(transformers_sy.TrainingArguments):
     cache_dir: Optional[str] = field(default=None)
     optim: str = field(default="adamw_torch")
     remove_unused_columns: bool = field(default=False)
@@ -175,7 +175,7 @@ def find_all_linear_names(model):
     return list(lora_module_names)
 
 
-def safe_save_model_for_hf_trainer(trainer: transformers.Trainer,
+def safe_save_model_for_hf_trainer(trainer: transformers_sy.Trainer,
                                    output_dir: str):
     """Collects the state dict and dump to disk."""
 
@@ -216,8 +216,8 @@ def safe_save_model_for_hf_trainer(trainer: transformers.Trainer,
 
 def smart_tokenizer_and_embedding_resize(
     special_tokens_dict: Dict,
-    tokenizer: transformers.PreTrainedTokenizer,
-    model: transformers.PreTrainedModel,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
+    model: transformers_sy.PreTrainedModel,
 ):
     """Resize tokenizer and embedding.
 
@@ -240,7 +240,7 @@ def smart_tokenizer_and_embedding_resize(
 
 
 def _tokenize_fn(strings: Sequence[str],
-                 tokenizer: transformers.PreTrainedTokenizer) -> Dict:
+                 tokenizer: transformers_sy.PreTrainedTokenizer) -> Dict:
     """Tokenize a list of strings."""
     tokenized_list = [
         tokenizer(
@@ -324,7 +324,7 @@ def preprocess_multimodal(
 
 def preprocess_llama_2(
     sources,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     has_image: bool = False
 ) -> Dict:
     conv = conversation_lib.default_conversation.copy()
@@ -406,7 +406,7 @@ def preprocess_llama_2(
 
 def preprocess_v1(
     sources,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     has_image: bool = False
 ) -> Dict:
     conv = conversation_lib.default_conversation.copy()
@@ -488,7 +488,7 @@ def preprocess_v1(
 
 def preprocess_mpt(
     sources,
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
 ) -> Dict:
     conv = conversation_lib.default_conversation.copy()
     roles = {"human": conv.roles[0], "gpt": conv.roles[1]}
@@ -554,7 +554,7 @@ def preprocess_mpt(
 
 def preprocess_plain(
     sources: Sequence[str],
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
 ) -> Dict:
     # add end signal and concatenate together
     conversations = []
@@ -574,7 +574,7 @@ def preprocess_plain(
 
 def preprocess(
     sources: Sequence[str],
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     has_image: bool = False
 ) -> Dict:
     """
@@ -624,7 +624,7 @@ class LazySupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
     def __init__(self, data_path: str,
-                 tokenizer: transformers.PreTrainedTokenizer,
+                 tokenizer: transformers_sy.PreTrainedTokenizer,
                  data_args: DataArguments):
         super(LazySupervisedDataset, self).__init__()
         list_data_dict = json.load(open(data_path, "r"))
@@ -698,7 +698,7 @@ class LazyM3ITSupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
     def __init__(self, data_path: str,
-                 tokenizer: transformers.PreTrainedTokenizer,
+                 tokenizer: transformers_sy.PreTrainedTokenizer,
                  data_args: dict):
         super(LazyM3ITSupervisedDataset, self).__init__()
         logging.warning("Loading data...")
@@ -825,7 +825,7 @@ class LazyM3ITSupervisedDataset(Dataset):
             ]}
         ]
         image = Image.open(BytesIO(b64decode(image_base64_str_list[0]))).convert('RGB')
-        from transformers.image_utils import to_numpy_array, get_channel_dimension_axis
+        from transformers_sy.image_utils import to_numpy_array, get_channel_dimension_axis
         i_numpy = to_numpy_array(image)
         c_axis = get_channel_dimension_axis(i_numpy)
         c_channel = i_numpy.shape[c_axis]
@@ -899,7 +899,7 @@ class LazyM3ITSupervisedDataset(Dataset):
 class DataCollatorForSupervisedDataset(object):
     """Collate examples for supervised fine-tuning."""
 
-    tokenizer: transformers.PreTrainedTokenizer
+    tokenizer: transformers_sy.PreTrainedTokenizer
 
     def __call__(self, instances: Sequence[Dict]) -> Dict[str, torch.Tensor]:
         input_ids, labels = tuple([instance[key] for instance in instances]
@@ -929,7 +929,7 @@ class DataCollatorForSupervisedDataset(object):
         return batch
 
 
-def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
+def make_supervised_data_module(tokenizer: transformers_sy.PreTrainedTokenizer,
                                 data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
     if data_args.mimicit_dataset:
@@ -975,7 +975,7 @@ def print_trainable_parameters(args, model):
 def train():
     global local_rank
 
-    parser = transformers.HfArgumentParser(
+    parser = transformers_sy.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     local_rank = training_args.local_rank
@@ -983,7 +983,7 @@ def train():
 
     bnb_model_from_pretrained_args = {}
     if training_args.bits in [4, 8]:
-        from transformers import BitsAndBytesConfig
+        from transformers_sy import BitsAndBytesConfig
         from peft import prepare_model_for_kbit_training
         bnb_model_from_pretrained_args.update(dict(
             device_map={"": torch.cuda.current_device()},
@@ -1002,7 +1002,7 @@ def train():
 
     if model_args.vision_tower is not None:
         if 'mpt' in model_args.model_name_or_path:
-            config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            config = transformers_sy.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             config.attn_config['attn_impl'] = training_args.mpt_attn_impl
             model = LlavaMPTForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
@@ -1017,7 +1017,7 @@ def train():
                 **bnb_model_from_pretrained_args
             )
     else:
-        model = transformers.LlamaForCausalLM.from_pretrained(
+        model = transformers_sy.LlamaForCausalLM.from_pretrained(
             model_args.model_name_or_path,
             cache_dir=training_args.cache_dir,
             **bnb_model_from_pretrained_args
@@ -1060,14 +1060,14 @@ def train():
         model = get_peft_model(model, lora_config)
 
     if 'mpt' in model_args.model_name_or_path:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(
+        tokenizer = transformers_sy.AutoTokenizer.from_pretrained(
             model_args.model_name_or_path,
             cache_dir=training_args.cache_dir,
             model_max_length=training_args.model_max_length,
             padding_side="right"
         )
     else:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(
+        tokenizer = transformers_sy.AutoTokenizer.from_pretrained(
             model_args.model_name_or_path,
             cache_dir=training_args.cache_dir,
             model_max_length=training_args.model_max_length,

@@ -27,9 +27,9 @@ from timm import create_model
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
 
-from transformers import BitConfig, BitForImageClassification, BitImageProcessor
-from transformers.image_utils import PILImageResampling
-from transformers.utils import logging
+from transformers_sy import BitConfig, BitForImageClassification, BitImageProcessor
+from transformers_sy.image_utils import PILImageResampling
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

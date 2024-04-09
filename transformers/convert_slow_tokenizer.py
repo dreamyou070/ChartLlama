@@ -34,9 +34,9 @@ def import_protobuf():
         import google.protobuf
 
         if version.parse(google.protobuf.__version__) < version.parse("4.0.0"):
-            from transformers.utils import sentencepiece_model_pb2
+            from transformers_sy.utils import sentencepiece_model_pb2
         else:
-            from transformers.utils import sentencepiece_model_pb2_new as sentencepiece_model_pb2
+            from transformers_sy.utils import sentencepiece_model_pb2_new as sentencepiece_model_pb2
     return sentencepiece_model_pb2
 
 

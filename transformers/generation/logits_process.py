@@ -582,7 +582,7 @@ class SequenceBiasLogitsProcessor(LogitsProcessor):
     Examples:
 
     ```python
-    >>> from transformers import AutoTokenizer, AutoModelForCausalLM
+    >>> from transformers_sy import AutoTokenizer, AutoModelForCausalLM
 
     >>> model = AutoModelForCausalLM.from_pretrained("gpt2")
     >>> tokenizer = AutoTokenizer.from_pretrained("gpt2")

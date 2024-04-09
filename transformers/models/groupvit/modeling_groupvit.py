@@ -1195,7 +1195,7 @@ class GroupViTTextModel(GroupViTPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import CLIPTokenizer, GroupViTTextModel
+        >>> from transformers_sy import CLIPTokenizer, GroupViTTextModel
 
         >>> tokenizer = CLIPTokenizer.from_pretrained("nvidia/groupvit-gcc-yfcc")
         >>> model = GroupViTTextModel.from_pretrained("nvidia/groupvit-gcc-yfcc")
@@ -1304,7 +1304,7 @@ class GroupViTVisionModel(GroupViTPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, GroupViTVisionModel
+        >>> from transformers_sy import AutoProcessor, GroupViTVisionModel
 
         >>> processor = AutoProcessor.from_pretrained("nvidia/groupvit-gcc-yfcc")
         >>> model = GroupViTVisionModel.from_pretrained("nvidia/groupvit-gcc-yfcc")
@@ -1391,7 +1391,7 @@ class GroupViTModel(GroupViTPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import CLIPTokenizer, GroupViTModel
+        >>> from transformers_sy import CLIPTokenizer, GroupViTModel
 
         >>> model = GroupViTModel.from_pretrained("nvidia/groupvit-gcc-yfcc")
         >>> tokenizer = CLIPTokenizer.from_pretrained("nvidia/groupvit-gcc-yfcc")
@@ -1438,7 +1438,7 @@ class GroupViTModel(GroupViTPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, GroupViTModel
+        >>> from transformers_sy import AutoProcessor, GroupViTModel
 
         >>> model = GroupViTModel.from_pretrained("nvidia/groupvit-gcc-yfcc")
         >>> processor = AutoProcessor.from_pretrained("nvidia/groupvit-gcc-yfcc")
@@ -1491,7 +1491,7 @@ class GroupViTModel(GroupViTPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, GroupViTModel
+        >>> from transformers_sy import AutoProcessor, GroupViTModel
 
         >>> model = GroupViTModel.from_pretrained("nvidia/groupvit-gcc-yfcc")
         >>> processor = AutoProcessor.from_pretrained("nvidia/groupvit-gcc-yfcc")

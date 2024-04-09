@@ -453,7 +453,7 @@ class MgpstrForSceneTextRecognition(MgpstrPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import (
+        >>> from transformers_sy import (
         ...     MgpstrProcessor,
         ...     MgpstrForSceneTextRecognition,
         ... )

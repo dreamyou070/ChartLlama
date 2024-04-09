@@ -1600,7 +1600,7 @@ class TrainingArguments:
             # - must be run before the model is created.
             if not is_accelerate_available():
                 raise ValueError("--deepspeed requires Accelerate to be installed: `pip install accelerate`.")
-            from transformers.deepspeed import HfTrainerDeepSpeedConfig
+            from transformers_sy.deepspeed import HfTrainerDeepSpeedConfig
 
             # will be used later by the Trainer
             # note: leave self.deepspeed unmodified in case a user relies on it not to be modified)
@@ -2090,7 +2090,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_training(learning_rate=1e-4, batch_size=32)
@@ -2150,7 +2150,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_evaluate(strategy="steps", steps=100)
@@ -2196,7 +2196,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_testing(batch_size=32)
@@ -2243,7 +2243,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_save(strategy="steps", steps=100)
@@ -2313,7 +2313,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_logging(strategy="steps", steps=100)
@@ -2383,7 +2383,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_push_to_hub("me/awesome-model")
@@ -2432,7 +2432,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_optimizer(name="adamw_torch", beta1=0.8)
@@ -2479,7 +2479,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_lr_scheduler(name="cosine", warmup_ratio=0.05)
@@ -2533,7 +2533,7 @@ class TrainingArguments:
         Example:
 
         ```py
-        >>> from transformers import TrainingArguments
+        >>> from transformers_sy import TrainingArguments
 
         >>> args = TrainingArguments("working_dir")
         >>> args = args.set_dataloader(train_batch_size=16, eval_batch_size=64)

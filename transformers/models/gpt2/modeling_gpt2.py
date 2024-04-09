@@ -1268,7 +1268,7 @@ class GPT2DoubleHeadsModel(GPT2PreTrainedModel):
 
         ```python
         >>> import torch
-        >>> from transformers import AutoTokenizer, GPT2DoubleHeadsModel
+        >>> from transformers_sy import AutoTokenizer, GPT2DoubleHeadsModel
 
         >>> tokenizer = AutoTokenizer.from_pretrained("gpt2")
         >>> model = GPT2DoubleHeadsModel.from_pretrained("gpt2")

@@ -7,7 +7,7 @@ from huggingface_hub import hf_hub_download
 from PIL import Image
 from timm.models import create_model
 
-from transformers import (
+from transformers_sy import (
     BeitImageProcessor,
     Data2VecVisionConfig,
     Data2VecVisionForImageClassification,

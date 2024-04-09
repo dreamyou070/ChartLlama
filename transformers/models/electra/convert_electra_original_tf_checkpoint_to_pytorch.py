@@ -19,8 +19,8 @@ import argparse
 
 import torch
 
-from transformers import ElectraConfig, ElectraForMaskedLM, ElectraForPreTraining, load_tf_weights_in_electra
-from transformers.utils import logging
+from transformers_sy import ElectraConfig, ElectraForMaskedLM, ElectraForPreTraining, load_tf_weights_in_electra
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

@@ -1415,7 +1415,7 @@ class BarkModel(BarkPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoProcessor, BarkModel
+        >>> from transformers_sy import AutoProcessor, BarkModel
 
         >>> processor = AutoProcessor.from_pretrained("ylacombe/bark-small")
         >>> model = BarkModel.from_pretrained("ylacombe/bark-small")

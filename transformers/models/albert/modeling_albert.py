@@ -812,7 +812,7 @@ class AlbertForPreTraining(AlbertPreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import AutoTokenizer, AlbertForPreTraining
+        >>> from transformers_sy import AutoTokenizer, AlbertForPreTraining
         >>> import torch
 
         >>> tokenizer = AutoTokenizer.from_pretrained("albert-base-v2")
@@ -955,7 +955,7 @@ class AlbertForMaskedLM(AlbertPreTrainedModel):
 
         ```python
         >>> import torch
-        >>> from transformers import AutoTokenizer, AlbertForMaskedLM
+        >>> from transformers_sy import AutoTokenizer, AlbertForMaskedLM
 
         >>> tokenizer = AutoTokenizer.from_pretrained("albert-base-v2")
         >>> model = AlbertForMaskedLM.from_pretrained("albert-base-v2")

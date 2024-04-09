@@ -1075,7 +1075,7 @@ class LukeModel(LukePreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, LukeModel
+        >>> from transformers_sy import AutoTokenizer, LukeModel
 
         >>> tokenizer = AutoTokenizer.from_pretrained("studio-ousia/luke-base")
         >>> model = LukeModel.from_pretrained("studio-ousia/luke-base")
@@ -1455,7 +1455,7 @@ class LukeForEntityClassification(LukePreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, LukeForEntityClassification
+        >>> from transformers_sy import AutoTokenizer, LukeForEntityClassification
 
         >>> tokenizer = AutoTokenizer.from_pretrained("studio-ousia/luke-large-finetuned-open-entity")
         >>> model = LukeForEntityClassification.from_pretrained("studio-ousia/luke-large-finetuned-open-entity")
@@ -1570,7 +1570,7 @@ class LukeForEntityPairClassification(LukePreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, LukeForEntityPairClassification
+        >>> from transformers_sy import AutoTokenizer, LukeForEntityPairClassification
 
         >>> tokenizer = AutoTokenizer.from_pretrained("studio-ousia/luke-large-finetuned-tacred")
         >>> model = LukeForEntityPairClassification.from_pretrained("studio-ousia/luke-large-finetuned-tacred")
@@ -1698,7 +1698,7 @@ class LukeForEntitySpanClassification(LukePreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer, LukeForEntitySpanClassification
+        >>> from transformers_sy import AutoTokenizer, LukeForEntitySpanClassification
 
         >>> tokenizer = AutoTokenizer.from_pretrained("studio-ousia/luke-large-finetuned-conll-2003")
         >>> model = LukeForEntitySpanClassification.from_pretrained("studio-ousia/luke-large-finetuned-conll-2003")

@@ -1083,7 +1083,7 @@ class DPTForDepthEstimation(DPTPreTrainedModel):
 
         Examples:
         ```python
-        >>> from transformers import AutoImageProcessor, DPTForDepthEstimation
+        >>> from transformers_sy import AutoImageProcessor, DPTForDepthEstimation
         >>> import torch
         >>> import numpy as np
         >>> from PIL import Image
@@ -1253,7 +1253,7 @@ class DPTForSemanticSegmentation(DPTPreTrainedModel):
 
         Examples:
         ```python
-        >>> from transformers import AutoImageProcessor, DPTForSemanticSegmentation
+        >>> from transformers_sy import AutoImageProcessor, DPTForSemanticSegmentation
         >>> from PIL import Image
         >>> import requests
 

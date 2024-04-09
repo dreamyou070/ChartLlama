@@ -949,7 +949,7 @@ class AutoConfig:
         Examples:
 
         ```python
-        >>> from transformers import AutoConfig
+        >>> from transformers_sy import AutoConfig
 
         >>> # Download configuration from huggingface.co and cache.
         >>> config = AutoConfig.from_pretrained("bert-base-uncased")

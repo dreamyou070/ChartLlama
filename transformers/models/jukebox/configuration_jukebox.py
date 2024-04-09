@@ -547,7 +547,7 @@ class JukeboxConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import JukeboxModel, JukeboxConfig
+    >>> from transformers_sy import JukeboxModel, JukeboxConfig
 
     >>> # Initializing a Jukebox configuration
     >>> configuration = JukeboxConfig()

@@ -21,8 +21,8 @@ import types
 
 import torch
 
-from transformers import AutoTokenizer, GPT2Config
-from transformers.modeling_utils import WEIGHTS_INDEX_NAME, WEIGHTS_NAME, shard_checkpoint
+from transformers_sy import AutoTokenizer, GPT2Config
+from transformers_sy.modeling_utils import WEIGHTS_INDEX_NAME, WEIGHTS_NAME, shard_checkpoint
 
 
 def add_checkpointing_args(parser):

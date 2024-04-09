@@ -1184,7 +1184,7 @@ class AltCLIPVisionModel(AltCLIPPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, AltCLIPVisionModel
+        >>> from transformers_sy import AutoProcessor, AltCLIPVisionModel
 
         >>> model = AltCLIPVisionModel.from_pretrained("BAAI/AltCLIP")
         >>> processor = AutoProcessor.from_pretrained("BAAI/AltCLIP")
@@ -1426,7 +1426,7 @@ class AltCLIPTextModel(AltCLIPPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, AltCLIPTextModel
+        >>> from transformers_sy import AutoProcessor, AltCLIPTextModel
 
         >>> model = AltCLIPTextModel.from_pretrained("BAAI/AltCLIP")
         >>> processor = AutoProcessor.from_pretrained("BAAI/AltCLIP")
@@ -1530,7 +1530,7 @@ class AltCLIPModel(AltCLIPPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoProcessor, AltCLIPModel
+        >>> from transformers_sy import AutoProcessor, AltCLIPModel
 
         >>> model = AltCLIPModel.from_pretrained("BAAI/AltCLIP")
         >>> processor = AutoProcessor.from_pretrained("BAAI/AltCLIP")
@@ -1576,7 +1576,7 @@ class AltCLIPModel(AltCLIPPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, AltCLIPModel
+        >>> from transformers_sy import AutoProcessor, AltCLIPModel
 
         >>> model = AltCLIPModel.from_pretrained("BAAI/AltCLIP")
         >>> processor = AutoProcessor.from_pretrained("BAAI/AltCLIP")
@@ -1626,7 +1626,7 @@ class AltCLIPModel(AltCLIPPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, AltCLIPModel
+        >>> from transformers_sy import AutoProcessor, AltCLIPModel
 
         >>> model = AltCLIPModel.from_pretrained("BAAI/AltCLIP")
         >>> processor = AutoProcessor.from_pretrained("BAAI/AltCLIP")

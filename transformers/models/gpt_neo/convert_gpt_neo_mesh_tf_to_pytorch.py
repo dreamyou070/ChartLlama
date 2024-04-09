@@ -18,8 +18,8 @@
 import argparse
 import json
 
-from transformers import GPTNeoConfig, GPTNeoForCausalLM, load_tf_weights_in_gpt_neo
-from transformers.utils import logging
+from transformers_sy import GPTNeoConfig, GPTNeoForCausalLM, load_tf_weights_in_gpt_neo
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

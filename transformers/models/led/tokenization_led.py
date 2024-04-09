@@ -98,7 +98,7 @@ class LEDTokenizer(PreTrainedTokenizer):
     be encoded differently whether it is at the beginning of the sentence (without space) or not:
 
     ```python
-    >>> from transformers import LEDTokenizer
+    >>> from transformers_sy import LEDTokenizer
 
     >>> tokenizer = LEDTokenizer.from_pretrained("allenai/led-base-16384")
     >>> tokenizer("Hello world")["input_ids"]

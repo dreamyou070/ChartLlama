@@ -29,7 +29,7 @@ import accelerate
 import pandas as pd
 import torch
 import tqdm
-import transformers
+import transformers_sy
 
 from peft.utils import WEIGHTS_NAME, get_peft_model_state_dict
 
@@ -90,7 +90,7 @@ class PPOTrainer(RLTrainer):
         policy: rl_models.ActorCritic,
         ref_policy: rl_models.Policy,
         reward_model,
-        tokenizer: transformers.PreTrainedTokenizer,
+        tokenizer: transformers_sy.PreTrainedTokenizer,
         accelerator: AlpacaAccelerator,
         optimizer: Optional[torch.optim.Optimizer] = None,
         lr_scheduler: Optional[LRScheduler] = None,
@@ -937,8 +937,8 @@ class PPOTrainer(RLTrainer):
 
 def smart_tokenizer_and_embedding_resize(
     num_new_tokens: int,
-    tokenizer: transformers.PreTrainedTokenizer,
-    model: transformers.PreTrainedModel,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
+    model: transformers_sy.PreTrainedModel,
 ):
     if num_new_tokens > 0:
         model.resize_token_embeddings(len(tokenizer))
@@ -960,7 +960,7 @@ def smart_tokenizer_and_embedding_resize(
 
 
 def make_models(
-    tokenizer: transformers.PreTrainedTokenizer,
+    tokenizer: transformers_sy.PreTrainedTokenizer,
     args,
     accelerator: accelerate.Accelerator,
     num_new_tokens: int = 0,

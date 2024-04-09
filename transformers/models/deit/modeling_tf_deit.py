@@ -743,7 +743,7 @@ class TFDeiTForMaskedImageModeling(TFDeiTPreTrainedModel):
 
         Examples:
         ```python
-        >>> from transformers import AutoImageProcessor, TFDeiTForMaskedImageModeling
+        >>> from transformers_sy import AutoImageProcessor, TFDeiTForMaskedImageModeling
         >>> import tensorflow as tf
         >>> from PIL import Image
         >>> import requests
@@ -868,7 +868,7 @@ class TFDeiTForImageClassification(TFDeiTPreTrainedModel, TFSequenceClassificati
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, TFDeiTForImageClassification
+        >>> from transformers_sy import AutoImageProcessor, TFDeiTForImageClassification
         >>> import tensorflow as tf
         >>> from PIL import Image
         >>> import requests

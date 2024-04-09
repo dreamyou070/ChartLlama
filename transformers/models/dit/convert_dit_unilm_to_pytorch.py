@@ -24,9 +24,9 @@ import torch
 from huggingface_hub import hf_hub_download
 from PIL import Image
 
-from transformers import BeitConfig, BeitForImageClassification, BeitForMaskedImageModeling, BeitImageProcessor
-from transformers.image_utils import PILImageResampling
-from transformers.utils import logging
+from transformers_sy import BeitConfig, BeitForImageClassification, BeitForMaskedImageModeling, BeitImageProcessor
+from transformers_sy.image_utils import PILImageResampling
+from transformers_sy.utils import logging
 
 
 logging.set_verbosity_info()

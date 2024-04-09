@@ -74,7 +74,7 @@ class DonutSwinConfig(PretrainedConfig):
     Example:
 
     ```python
-    >>> from transformers import DonutSwinConfig, DonutSwinModel
+    >>> from transformers_sy import DonutSwinConfig, DonutSwinModel
 
     >>> # Initializing a Donut naver-clova-ix/donut-base style configuration
     >>> configuration = DonutSwinConfig()

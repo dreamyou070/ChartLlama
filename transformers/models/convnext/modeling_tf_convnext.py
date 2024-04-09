@@ -434,7 +434,7 @@ class TFConvNextModel(TFConvNextPreTrainedModel):
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, TFConvNextModel
+        >>> from transformers_sy import AutoImageProcessor, TFConvNextModel
         >>> from PIL import Image
         >>> import requests
 
@@ -517,7 +517,7 @@ class TFConvNextForImageClassification(TFConvNextPreTrainedModel, TFSequenceClas
         Examples:
 
         ```python
-        >>> from transformers import AutoImageProcessor, TFConvNextForImageClassification
+        >>> from transformers_sy import AutoImageProcessor, TFConvNextForImageClassification
         >>> import tensorflow as tf
         >>> from PIL import Image
         >>> import requests

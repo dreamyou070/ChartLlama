@@ -28,7 +28,7 @@ from huggingface_hub.hf_api import list_models
 from torch import nn
 from tqdm import tqdm
 
-from transformers import MarianConfig, MarianMTModel, MarianTokenizer
+from transformers_sy import MarianConfig, MarianMTModel, MarianTokenizer
 
 
 def remove_suffix(text: str, suffix: str):

@@ -54,7 +54,7 @@ from .utils import _prepare_prompt_learning_config
 
 
 if TYPE_CHECKING:
-    from transformers import PreTrainedModel
+    from transformers_sy import PreTrainedModel
 
 
 MODEL_TYPE_TO_PEFT_MODEL_MAPPING: dict[str, PeftModel] = {

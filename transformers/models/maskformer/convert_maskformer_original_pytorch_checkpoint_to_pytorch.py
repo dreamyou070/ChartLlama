@@ -29,15 +29,15 @@ from detectron2.projects.deeplab import add_deeplab_config
 from PIL import Image
 from torch import Tensor, nn
 
-from transformers.models.maskformer.feature_extraction_maskformer import MaskFormerImageProcessor
-from transformers.models.maskformer.modeling_maskformer import (
+from transformers_sy.models.maskformer.feature_extraction_maskformer import MaskFormerImageProcessor
+from transformers_sy.models.maskformer.modeling_maskformer import (
     MaskFormerConfig,
     MaskFormerForInstanceSegmentation,
     MaskFormerForInstanceSegmentationOutput,
     MaskFormerModel,
     MaskFormerModelOutput,
 )
-from transformers.utils import logging
+from transformers_sy.utils import logging
 
 
 StateDict = Dict[str, Tensor]

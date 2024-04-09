@@ -9,11 +9,11 @@ from typing import Optional, List, Literal
 import logging
 
 import torch
-import transformers
+import transformers_sy
 import argparse
-from transformers import set_seed
+from transformers_sy import set_seed
 
-from transformers import AutoTokenizer
+from transformers_sy import AutoTokenizer
 
 from lora_utils import (
     SavePeftModelCallback,
@@ -94,7 +94,7 @@ class DataArguments:
 
 
 @dataclass
-class TrainingArguments(transformers.Seq2SeqTrainingArguments):
+class TrainingArguments(transformers_sy.Seq2SeqTrainingArguments):
     cache_dir: Optional[str] = field(default=None)
     # From LLaVA
     remove_unused_columns: bool = field(default=False)
@@ -242,7 +242,7 @@ def rank0_print(*args):
 
 
 def train():
-    hfparser = transformers.HfArgumentParser(
+    hfparser = transformers_sy.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments)
     )
     (

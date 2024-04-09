@@ -18,7 +18,7 @@ import os
 
 import torch
 
-from transformers import FlavaImageCodebook, FlavaImageCodebookConfig
+from transformers_sy import FlavaImageCodebook, FlavaImageCodebookConfig
 
 
 def rreplace(s, old, new, occurrence):

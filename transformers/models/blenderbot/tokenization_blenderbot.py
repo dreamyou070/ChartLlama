@@ -26,7 +26,7 @@ from ...utils import logging
 
 
 if TYPE_CHECKING:
-    from transformers.pipelines.conversational import Conversation
+    from transformers_sy.pipelines.conversational import Conversation
 
 logger = logging.get_logger(__name__)
 
@@ -97,7 +97,7 @@ class BlenderbotTokenizer(PreTrainedTokenizer):
     be encoded differently whether it is at the beginning of the sentence (without space) or not:
 
     ```python
-    >>> from transformers import BlenderbotTokenizer
+    >>> from transformers_sy import BlenderbotTokenizer
 
     >>> tokenizer = BlenderbotTokenizer.from_pretrained("facebook/blenderbot-3B")
     >>> tokenizer.add_prefix_space = False

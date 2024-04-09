@@ -21,7 +21,7 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 
-from transformers import LongformerForQuestionAnswering, LongformerModel
+from transformers_sy import LongformerForQuestionAnswering, LongformerModel
 
 
 class LightningModel(pl.LightningModule):

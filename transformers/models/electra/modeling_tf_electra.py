@@ -1017,7 +1017,7 @@ class TFElectraForPreTraining(TFElectraPreTrainedModel):
 
         ```python
         >>> import tensorflow as tf
-        >>> from transformers import AutoTokenizer, TFElectraForPreTraining
+        >>> from transformers_sy import AutoTokenizer, TFElectraForPreTraining
 
         >>> tokenizer = AutoTokenizer.from_pretrained("google/electra-small-discriminator")
         >>> model = TFElectraForPreTraining.from_pretrained("google/electra-small-discriminator")

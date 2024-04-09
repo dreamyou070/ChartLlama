@@ -598,7 +598,7 @@ class AutoTokenizer:
         Examples:
 
         ```python
-        >>> from transformers import AutoTokenizer
+        >>> from transformers_sy import AutoTokenizer
 
         >>> # Download vocabulary from huggingface.co and cache.
         >>> tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")

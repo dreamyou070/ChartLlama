@@ -1360,7 +1360,7 @@ class FlavaModel(FlavaPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import AutoProcessor, FlavaModel
+        >>> from transformers_sy import AutoProcessor, FlavaModel
 
         >>> model = FlavaModel.from_pretrained("facebook/flava-full")
         >>> processor = AutoProcessor.from_pretrained("facebook/flava-full")
@@ -1797,7 +1797,7 @@ class FlavaForPreTraining(FlavaPreTrainedModel):
         ```python
         >>> from PIL import Image
         >>> import requests
-        >>> from transformers import FlavaForPreTraining, AutoProcessor
+        >>> from transformers_sy import FlavaForPreTraining, AutoProcessor
 
         >>> url = "http://images.cocodataset.org/val2017/000000039769.jpg"
         >>> image = Image.open(requests.get(url, stream=True).raw)
