@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # [1] model argument (what is mm ?)
 model_name_or_path="lmsys/vicuna-13b-v1.5"
 VERSION="v1"
@@ -7,7 +6,7 @@ vision_tower="openai/clip-vit-large-patch14-336"
 pretrain_mm_mlp_adapter="/share0/dreamyou070/dreamyou070/CharLlama/ChartLlama/training_result_sy/liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5/mm_projector.bin"
 mm_projector_type="mlp2x_gelu"
 # [2] data argument
-data_path='data/ChartLlama-Dataset/ours/box_chart_100examples_simplified_qa.json'
+data_path='data/ChartLlama-Dataset/box_chart_100examples_simplified_qa.json'
 image_folder='data/ChartLlama-Dataset/ours/ours/box_chart/png'
 # [3] Training Argument
 
@@ -24,7 +23,7 @@ deepspeed train.py \
     --image_aspect_ratio pad \
     --fp16 True \
     --lora_r 64 \
-    --output_dir ./checkpoints/finetune_lora_only_chartqa \
+    --output_dir ./training_result_sy/finetune_llm_lora_only_chartqa \
     --num_train_epochs 1 \
     --per_device_train_batch_size 2 \
     --per_device_eval_batch_size 4 \
