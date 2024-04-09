@@ -666,8 +666,10 @@ class LazySupervisedDataset(Dataset):
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
         if 'image' in sources[0]:
             image_file = self.list_data_dict[i]['image']
-            image_folder = self.data_args.image_folder
+            image_folder = self.data_args.image_folder # image_folder
             processor = self.data_args.image_processor
+
+            # [1] open image
             image = Image.open(os.path.join(image_folder, image_file)).convert('RGB')
             if self.data_args.image_aspect_ratio == 'pad':
                 def expand2square(pil_img, background_color):
@@ -866,6 +868,7 @@ def train():
         data_args.is_multimodal = True
         # image grid pinpoint 란 ?
         model.config.image_aspect_ratio = data_args.image_aspect_ratio
+        # why grid ?
         model.config.image_grid_pinpoints = data_args.image_grid_pinpoints
 
         model.config.tune_mm_mlp_adapter = training_args.tune_mm_mlp_adapter = model_args.tune_mm_mlp_adapter
@@ -905,12 +908,15 @@ def train():
                     if training_args.bf16 and module.weight.dtype == torch.float32:
                         module = module.to(torch.bfloat16)
 
+    print(f'\n step 3. make data module')
     data_module = make_supervised_data_module(tokenizer=tokenizer,
                                               data_args=data_args)
+
+    print(f'\n step 4. make trainer')
     trainer = LLaVATrainer(model=model,
-                    tokenizer=tokenizer,
-                    args=training_args,
-                    **data_module)
+                        tokenizer=tokenizer,
+                        args=training_args,
+                        **data_module)
 
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)
