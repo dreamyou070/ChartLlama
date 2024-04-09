@@ -1,7 +1,7 @@
 model_name_or_path="listen2you002/ChartLlama-13b"
-question-file="data/ChartLlama-Dataset/ours/box_chart_100examples_simplified_qa.json"
-image-folder="data/ChartLlama-Dataset/ours"
-answers-file="data/ChartLlama-Dataset/answer/box_chart_answer.json"
+question-file="./data/ChartLlama-Dataset/ours/box_chart_100examples_simplified_qa.json"
+image-folder="./data/ChartLlama-Dataset/ours"
+answers-file="./data/ChartLlama-Dataset/answer/box_chart_answer.json"
 CHUNKS=1
 IDX=0
 

@@ -121,9 +121,9 @@ venv.bak/
 /site
 
 # mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+#.mypy_cache/
+#.dmypy.json
+#dmypy.json
 
 # Pyre type checker
 .pyre/
@@ -135,7 +135,7 @@ dmypy.json
 tmp_scripts/
 
 # Data
-!**/alpaca-data-conversation.json
+#!**/alpaca-data-conversation.json
 
 # Editor
 *.swp

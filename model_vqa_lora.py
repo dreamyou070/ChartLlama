@@ -150,23 +150,26 @@ def create_data_loader(questions, image_folder, tokenizer, image_processor, mode
 
 
 def eval_model(args):
-    # Model
+
+    print(f' step 1. load model')
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
 
     # questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
+    print(f'\n step 2. task')
+    print(f' (2.1) load questions')
     questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
+    print(f' (2.2) answer file')
     answers_file = os.path.expanduser(args.answers_file)
     os.makedirs(os.path.dirname(answers_file), exist_ok=True)
     ans_file = open(answers_file, "w")
-
     if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
         args.conv_mode = args.conv_mode + '_mmtag'
         print(f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
-
+    print(f' (2.3) datas (loader)')
     data_loader = create_data_loader(questions, args.image_folder, tokenizer, image_processor, model.config)
 
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
@@ -221,5 +224,4 @@ if __name__ == "__main__":
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
     args = parser.parse_args()
-
     eval_model(args)
