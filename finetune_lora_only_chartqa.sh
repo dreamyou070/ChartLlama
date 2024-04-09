@@ -25,7 +25,7 @@
 
 # just llave finetuning
 
-deepspeed llava/train/train.py \
+deepspeed llava/train.py \
     --deepspeed ./scripts/zero3.json \
     --lora_enable True \
     --model_name_or_path /mnt/gyfs/yuchenghan/llama2_models/vicuna-13b-v1.5 \

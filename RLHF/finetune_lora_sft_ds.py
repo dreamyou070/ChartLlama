@@ -5,8 +5,7 @@ import json
 
 import os
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Sequence, List
-import numpy as np
+from typing import Optional, List
 import logging
 import pathlib
 
@@ -32,7 +31,6 @@ from transformers import AutoTokenizer
 from lora_utils import (
     print_trainable_parameters,
     get_last_checkpoint,
-    DEFAULT_PAD_TOKEN,
 )
 from data_utils.data_utils_sft import (
     make_sft_data_module,
@@ -40,18 +38,11 @@ from data_utils.data_utils_sft import (
 from models.qlora_model import get_accelerate_model
 
 from llava import conversation as conversation_lib
-from llava.model import *
-from llava.mm_utils import tokenizer_image_token
 from llava.constants import (
-    IGNORE_INDEX,
     IMAGE_TOKEN_INDEX,
-    DEFAULT_IMAGE_TOKEN,
-    DEFAULT_IM_START_TOKEN,
-    DEFAULT_IM_END_TOKEN,
 )
 
-from llava.train.train import smart_tokenizer_and_embedding_resize
-from data_utils.common_utils import preprocess
+from llava.train import smart_tokenizer_and_embedding_resize
 
 torch.backends.cuda.matmul.allow_tf32 = True
 

@@ -19,7 +19,6 @@ from lora_utils import (
     SavePeftModelCallback,
     print_trainable_parameters,
     get_last_checkpoint,
-    DEFAULT_PAD_TOKEN,
 )
 from data_utils.data_utils_rm import make_binary_reward_modeling_data_module
 from models.reward_model import (
@@ -30,18 +29,11 @@ from models.reward_model import (
 )
 
 from llava import conversation as conversation_lib
-from llava.model import *
-from llava.mm_utils import tokenizer_image_token
 from llava.constants import (
-    IGNORE_INDEX,
     IMAGE_TOKEN_INDEX,
-    DEFAULT_IMAGE_TOKEN,
-    DEFAULT_IM_START_TOKEN,
-    DEFAULT_IM_END_TOKEN,
 )
 
-from llava.train.train import smart_tokenizer_and_embedding_resize
-from data_utils.common_utils import preprocess
+from llava.train import smart_tokenizer_and_embedding_resize
 
 torch.backends.cuda.matmul.allow_tf32 = True
 

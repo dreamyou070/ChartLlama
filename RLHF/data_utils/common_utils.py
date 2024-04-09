@@ -36,12 +36,11 @@ import transformers
 from llava import conversation as conversation_lib
 from llava.constants import (
     IGNORE_INDEX,
-    IMAGE_TOKEN_INDEX,
     DEFAULT_IMAGE_TOKEN,
     DEFAULT_IM_START_TOKEN,
     DEFAULT_IM_END_TOKEN,
 )
-from llava.train.train import DataArguments
+from llava.train import DataArguments
 from llava.mm_utils import tokenizer_image_token
 
 from data_utils.constants import FACTUAL_PROMPT
