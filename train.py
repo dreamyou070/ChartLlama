@@ -568,11 +568,9 @@ def preprocess_plain(
     return dict(input_ids=input_ids, labels=targets)
 
 
-def preprocess(
-    sources: Sequence[str],
-    tokenizer: transformers.PreTrainedTokenizer,
-    has_image: bool = False
-) -> Dict:
+def preprocess(sources: Sequence[str],
+               tokenizer: transformers.PreTrainedTokenizer,
+               has_image: bool = False) -> Dict:
     """
     Given a list of sources, each is a conversation list. This transform:
     1. Add signal '### ' at the beginning each sentence, with end signal '\n';
@@ -654,17 +652,17 @@ class LazySupervisedDataset(Dataset):
 
     def __getitem__(self, i) -> Dict[str, torch.Tensor]:
         sources = self.list_data_dict[i]
-        if isinstance(i, int):
-            sources = [sources]
+        if isinstance(i, int): sources = [sources]
         assert len(sources) == 1, "Don't know why it is wrapped to a list"  # FIXME
-        if 'image' in sources[0]:
-            image_file = self.list_data_dict[i]['image']
-            image_folder = self.data_args.image_folder # image_folder
-            processor = self.data_args.image_processor
 
-            # [1] open image
-            image = Image.open(os.path.join(image_folder, image_file)).convert('RGB')
+        if 'image' in sources[0]:
+
+            # [1] open image and preprocessing
+            processor = self.data_args.image_processor
+            image_file = self.list_data_dict[i]['image']
+            image = Image.open(os.path.join(self.data_args.image_folder, image_file)).convert('RGB')
             if self.data_args.image_aspect_ratio == 'pad':
+                # paper says, padding .
                 def expand2square(pil_img, background_color):
                     width, height = pil_img.size
                     if width == height:
@@ -681,15 +679,16 @@ class LazySupervisedDataset(Dataset):
                 image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
             else:
                 image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
-            sources = preprocess_multimodal(
-                copy.deepcopy([e["conversations"] for e in sources]),
-                self.data_args)
+            sources = preprocess_multimodal(copy.deepcopy([e["conversations"] for e in sources]), self.data_args)
         else:
             sources = copy.deepcopy([e["conversations"] for e in sources])
-        data_dict = preprocess(
-            sources,
-            self.tokenizer,
-            has_image=('image' in self.list_data_dict[i]))
+
+
+        # [2] preprocess (input_data, target label)
+        data_dict = preprocess(sources,
+                               self.tokenizer,
+                               has_image=('image' in self.list_data_dict[i]))
+
         if isinstance(i, int):
             data_dict = dict(input_ids=data_dict["input_ids"][0],
                              labels=data_dict["labels"][0])
@@ -698,6 +697,7 @@ class LazySupervisedDataset(Dataset):
         if 'image' in self.list_data_dict[i]:
             data_dict['image'] = image
         elif self.data_args.is_multimodal:
+            # no data is necessary
             # image does not exist in the data, but the model is multimodal
             crop_size = self.data_args.image_processor.crop_size
             data_dict['image'] = torch.zeros(3, crop_size['height'], crop_size['width'])

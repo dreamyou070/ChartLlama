@@ -8,8 +8,10 @@
 # PROMPT_VERSION=v1
 model_name_or_path="lmsys/vicuna-13b-v1.5"
 VERSION="v1"
-vision_tower="openai/clip-vit-large-patch14-336"
-pretrain_mm_mlp_adapter="liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin" # ???
+#vision_tower="openai/clip-vit-large-patch14-336"
+vision_tower="liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5"
+#pretrain_mm_mlp_adapter="liuhaotian/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin" # ???
+#--pretrain_mm_mlp_adapter ${pretrain_mm_mlp_adapter} \
 
 # the mm_mlp_adapter is ignored
 #--pretrain_mm_mlp_adapter /mnt/private_yucheng/huggingface_hub/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin \
@@ -42,7 +44,6 @@ deepspeed train.py \
     --model_name_or_path ${model_name_or_path} \
     --version ${VERSION} \
     --vision_tower ${vision_tower} \
-    --pretrain_mm_mlp_adapter ${pretrain_mm_mlp_adapter} \
     --cache_dir training_result_sy \
     --freeze_backbone True \
     --lora_enable True \

@@ -1,6 +1,6 @@
 CHUNKS=1
 IDX=0
-
+# listen2you002/ChartLlama-13b
 CUDA_VISIBLE_DEVICES=1 \
   python model_vqa_lora.py \
  --model-path "listen2you002/ChartLlama-13b" \
