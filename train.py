@@ -292,27 +292,34 @@ def _add_speaker_and_signal(header, source, get_conversation=True):
     return conversation
 
 
-def preprocess_multimodal(
-    sources: Sequence[str],
-    data_args: DataArguments
-) -> Dict:
+def preprocess_multimodal(sources: Sequence[str],data_args: DataArguments) -> Dict:
     is_multimodal = data_args.is_multimodal
+
     if not is_multimodal:
         return sources
 
     for source in sources:
+        # source 1 = {"from": "human", "value": "<image>\nWhat is the title of the chart?"}
+        # source 2 = {"from": "gpt", "value": "Analysis of smartphone usage patterns"}
         for sentence in source:
             if DEFAULT_IMAGE_TOKEN in sentence['value']:
+                # "<image>\nWhat is the title of the chart?"
+                # "prompt"
+                # add every image token
                 sentence['value'] = sentence['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
                 sentence['value'] = DEFAULT_IMAGE_TOKEN + '\n' + sentence['value']
                 sentence['value'] = sentence['value'].strip()
                 if "mmtag" in conversation_lib.default_conversation.version:
                     sentence['value'] = sentence['value'].replace(DEFAULT_IMAGE_TOKEN, '<Image>' + DEFAULT_IMAGE_TOKEN + '</Image>')
+            # replace image token with "<image>"
             replace_token = DEFAULT_IMAGE_TOKEN
-            if data_args.mm_use_im_start_end:
-                replace_token = DEFAULT_IM_START_TOKEN + replace_token + DEFAULT_IM_END_TOKEN
-            sentence["value"] = sentence["value"].replace(DEFAULT_IMAGE_TOKEN, replace_token)
 
+            if data_args.mm_use_im_start_end:
+                # "<im_start><im_patch>0<im_end>"
+                replace_token = DEFAULT_IM_START_TOKEN + replace_token + DEFAULT_IM_END_TOKEN
+            # final value = original value(img -> relace token) + replace token
+            sentence["value"] = sentence["value"].replace(DEFAULT_IMAGE_TOKEN, replace_token)
+    # new answer dict
     return sources
 
 
@@ -678,27 +685,29 @@ class LazySupervisedDataset(Dataset):
                 image = expand2square(image, tuple(int(x*255) for x in processor.image_mean))
                 image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
             else:
-                image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+                image = processor.preprocess(image, return_tensors='pt')['pixel_values'][0] # torch image
+            # sources [conversations] = [{"from": "human", "value": "<image>\nWhat is the title of the chart?"},
+            #                            {"from": "gpt", "value": "Analysis of smartphone usage patterns"}]
             sources = preprocess_multimodal(copy.deepcopy([e["conversations"] for e in sources]), self.data_args)
         else:
             sources = copy.deepcopy([e["conversations"] for e in sources])
 
-
         # [2] preprocess (input_data, target label)
-        data_dict = preprocess(sources,
-                               self.tokenizer,
-                               has_image=('image' in self.list_data_dict[i]))
+        data_dict = preprocess(sources,        # tokenized image data (same token idx)
+                               self.tokenizer, # tokenizer
+                               has_image=('image' in self.list_data_dict[i])) # image path (True, False)
 
         if isinstance(i, int):
             data_dict = dict(input_ids=data_dict["input_ids"][0],
                              labels=data_dict["labels"][0])
 
         # image exist in the data
+        print(f'image = (maybe path) {image}')
         if 'image' in self.list_data_dict[i]:
             data_dict['image'] = image
+
         elif self.data_args.is_multimodal:
-            # no data is necessary
-            # image does not exist in the data, but the model is multimodal
+            # open image and cropping
             crop_size = self.data_args.image_processor.crop_size
             data_dict['image'] = torch.zeros(3, crop_size['height'], crop_size['width'])
         return data_dict

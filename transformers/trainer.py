@@ -1542,9 +1542,7 @@ class Trainer:
             ignore_keys_for_eval=ignore_keys_for_eval,
         )
 
-    def _inner_training_loop(
-        self, batch_size=None, args=None, resume_from_checkpoint=None, trial=None, ignore_keys_for_eval=None
-    ):
+    def _inner_training_loop( self, batch_size=None, args=None, resume_from_checkpoint=None, trial=None, ignore_keys_for_eval=None):
         self.accelerator.free_memory()
         self._train_batch_size = batch_size
         logger.debug(f"Currently training with a batch size of: {self._train_batch_size}")
@@ -1764,11 +1762,8 @@ class Trainer:
             if args.past_index >= 0:
                 self._past = None
 
-            steps_in_epoch = (
-                len(epoch_iterator)
-                if len_dataloader is not None
-                else args.max_steps * args.gradient_accumulation_steps
-            )
+            steps_in_epoch = (len(epoch_iterator) if len_dataloader is not None
+                else args.max_steps * args.gradient_accumulation_steps)
             self.control = self.callback_handler.on_epoch_begin(args, self.state, self.control)
 
             if epoch == epochs_trained and resume_from_checkpoint is not None and steps_trained_in_current_epoch == 0:
@@ -1804,14 +1799,13 @@ class Trainer:
                 if step % args.gradient_accumulation_steps == 0:
                     self.control = self.callback_handler.on_step_begin(args, self.state, self.control)
 
+                # [1] loss
                 with self.accelerator.accumulate(model):
                     tr_loss_step = self.training_step(model, inputs)
 
-                if (
-                    args.logging_nan_inf_filter
+                if (args.logging_nan_inf_filter
                     and not is_torch_tpu_available()
-                    and (torch.isnan(tr_loss_step) or torch.isinf(tr_loss_step))
-                ):
+                    and (torch.isnan(tr_loss_step) or torch.isinf(tr_loss_step))):
                     # if loss is nan or inf simply add the average of previous logged losses
                     tr_loss += tr_loss / (1 + self.state.global_step - self._globalstep_last_logged)
                 else:
@@ -1831,9 +1825,7 @@ class Trainer:
                 ):
                     # the `or` condition of `is_last_step_and_steps_less_than_grad_acc` is not covered
                     # in accelerate. So, explicitly enable sync gradients to True in that case.
-                    if is_last_step_and_steps_less_than_grad_acc or (
-                        version.parse(accelerate_version) <= version.parse("0.20.3")
-                    ):
+                    if is_last_step_and_steps_less_than_grad_acc or ( version.parse(accelerate_version) <= version.parse("0.20.3")):
                         self.accelerator.gradient_state._set_sync_gradients(True)
 
                     # Gradient clipping
@@ -1858,15 +1850,10 @@ class Trainer:
                             model.clip_grad_norm_(args.max_grad_norm)
                         elif self.use_apex:
                             # Revert to normal clipping otherwise, handling Apex or full precision
-                            nn.utils.clip_grad_norm_(
-                                amp.master_params(self.optimizer),
-                                args.max_grad_norm,
-                            )
+                            nn.utils.clip_grad_norm_(amp.master_params(self.optimizer),
+                                args.max_grad_norm, )
                         else:
-                            self.accelerator.clip_grad_norm_(
-                                model.parameters(),
-                                args.max_grad_norm,
-                            )
+                            self.accelerator.clip_grad_norm_(model.parameters(),args.max_grad_norm,)
 
                     # Optimizer step
                     optimizer_was_run = True
@@ -2593,10 +2580,8 @@ class Trainer:
         """
         inputs = self._prepare_input(inputs)
         if len(inputs) == 0:
-            raise ValueError(
-                "The batch received was empty, your model won't be able to train on it. Double-check that your "
-                f"training dataset contains keys expected by the model: {','.join(self._signature_columns)}."
-            )
+            raise ValueError("The batch received was empty, your model won't be able to train on it. Double-check that your "
+                f"training dataset contains keys expected by the model: {','.join(self._signature_columns)}.")
         if self.args.past_index >= 0 and self._past is not None:
             inputs["mems"] = self._past
 
@@ -2642,6 +2627,8 @@ class Trainer:
         Return:
             `torch.Tensor`: The tensor with training loss on this batch.
         """
+
+        # [1] input
         model.train()
         inputs = self._prepare_inputs(inputs)
 
@@ -2649,6 +2636,7 @@ class Trainer:
             loss_mb = smp_forward_backward(model, inputs, self.args.gradient_accumulation_steps)
             return loss_mb.reduce_mean().detach().to(self.args.device)
 
+        # [2] loss
         with self.compute_loss_context_manager():
             loss = self.compute_loss(model, inputs)
 
@@ -2666,21 +2654,23 @@ class Trainer:
         return loss.detach() / self.args.gradient_accumulation_steps
 
     def compute_loss(self, model, inputs, return_outputs=False):
-        """
-        How the loss is computed by Trainer. By default, all models return the loss in the first element.
-
-        Subclass and override for custom behavior.
-        """
+        """        How the loss is computed by Trainer. By default, all models return the loss in the first element.
+        Subclass and override for custom behavior.        """
+        # -------------------------------------------------------------------------------
+        # [1] input
         if self.label_smoother is not None and "labels" in inputs:
             labels = inputs.pop("labels")
         else:
             labels = None
+        # -------------------------------------------------------------------------------
+        # [2] model output
         outputs = model(**inputs)
-        # Save past state if it exists
+
         # TODO: this needs to be fixed and made cleaner later.
         if self.args.past_index >= 0:
             self._past = outputs[self.args.past_index]
 
+        # [3] label is target (label_smoother makes label with outputs)
         if labels is not None:
             if unwrap_model(model)._get_name() in MODEL_FOR_CAUSAL_LM_MAPPING_NAMES.values():
                 loss = self.label_smoother(outputs, labels, shift_labels=True)
@@ -2688,13 +2678,11 @@ class Trainer:
                 loss = self.label_smoother(outputs, labels)
         else:
             if isinstance(outputs, dict) and "loss" not in outputs:
-                raise ValueError(
-                    "The model did not return a loss from the inputs, only the following keys: "
-                    f"{','.join(outputs.keys())}. For reference, the inputs it received are {','.join(inputs.keys())}."
-                )
-            # We don't use .loss here since the model may return tuples instead of ModelOutput.
+                raise ValueError("The model did not return a loss from the inputs, only the following keys: "
+                                f"{','.join(outputs.keys())}. For reference, the inputs it received are {','.join(inputs.keys())}.")
             loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
 
+        # [4] final return value (is just loss)
         return (loss, outputs) if return_outputs else loss
 
     def is_local_process_zero(self) -> bool:
