@@ -20,8 +20,8 @@ import torch
 import torch.nn.functional as F
 import math
 
-from transformers_sy import AutoConfig, AutoModelForCausalLM
-from transformers_sy.modeling_outputs import CausalLMOutputWithPast
+from transformers import AutoConfig, AutoModelForCausalLM
+from transformers.modeling_outputs import CausalLMOutputWithPast
 
 from .mpt.modeling_mpt import MPTConfig, MPTForCausalLM, MPTModel
 from llava.model.llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
