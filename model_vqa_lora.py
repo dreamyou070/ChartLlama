@@ -15,13 +15,14 @@ from llava.model import *
 from llava.utils import disable_torch_init
 from llava.mm_utils import tokenizer_image_token, process_images, get_model_name_from_path
 from torch.utils.data import Dataset, DataLoader
-
 from PIL import Image
 import math
 
-def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, load_4bit=False, device_map="auto", device="cuda"):
-    kwargs = {"device_map": device_map}
+def load_pretrained_model(model_path, model_base,
+                          model_name, load_8bit=False, load_4bit=False,
+                          device_map="auto", device="cuda"):
 
+    kwargs = {"device_map": device_map}
     if load_8bit:
         kwargs['load_in_8bit'] = True
     elif load_4bit:
@@ -44,9 +45,8 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         print(f' [2] loading lora config)')
         lora_cfg_pretrained = AutoConfig.from_pretrained(model_path) # LlavaConfig
         lora_cfg_pretrained.mm_vision_tower = args.vision_tower
-        print(f'lora_cfg_pretrained: {lora_cfg_pretrained}')
 
-        print(f' [3] base model')
+        print(f' [3.1] base model with lora')
         model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                       low_cpu_mem_usage=True,
                                                       config=lora_cfg_pretrained,
@@ -60,12 +60,11 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
             non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
         else:
-            # this is probably from HF Hub
             from huggingface_hub import hf_hub_download
             def load_from_hf(repo_id, filename, subfolder=None):
                 cache_file = hf_hub_download(repo_id=repo_id,
-                    filename=filename,
-                    subfolder=subfolder)
+                                             filename=filename,
+                                             subfolder=subfolder)
                 return torch.load(cache_file, map_location='cpu')
             non_lora_trainables = load_from_hf(model_path, 'non_lora_trainables.bin')
         non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in non_lora_trainables.items()}
@@ -73,15 +72,15 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
         model.load_state_dict(non_lora_trainables, strict=False)
 
+        print(f' [3.3] loading lora weights and merging')
+        # parameter efficient
         from peft import PeftModel
-        print('Loading LoRA weights...')
         model = PeftModel.from_pretrained(model, model_path)
-        print('Merging LoRA weights...')
         model = model.merge_and_unload()
         print('Model is loaded...')
 
+    print(f' [4] tokenizer agumenting with patch token')
     image_processor = None
-
     mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)
     mm_use_im_patch_token = getattr(model.config, "mm_use_im_patch_token", True)
     if mm_use_im_patch_token:
@@ -90,9 +89,11 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
     model.resize_token_embeddings(len(tokenizer))
 
+    print(f' [5] vision model')
     vision_tower = model.get_vision_tower()
     if not vision_tower.is_loaded:
         vision_tower.load_model()
+    # what is device ?
     vision_tower.to(device=device, dtype=torch.float16)
     image_processor = vision_tower.image_processor
 
@@ -179,7 +180,9 @@ def eval_model(args):
         print(f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
     data_loader = create_data_loader(questions, args.image_folder, tokenizer, image_processor, model.config)
 
+
     print(f'\n step 3. Inference')
+
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["id"]
         cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
