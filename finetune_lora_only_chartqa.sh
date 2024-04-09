@@ -23,6 +23,8 @@
 #--pretrain_mm_mlp_adapter /mnt/private_yucheng/huggingface_hub/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin \
 # --group_by_modality_length True \
 
+# just llave finetuning
+
 deepspeed llava/train/train.py \
     --deepspeed ./scripts/zero3.json \
     --lora_enable True \
@@ -57,4 +59,4 @@ deepspeed llava/train/train.py \
     --model_max_length 2048 \
     --gradient_checkpointing True \
     --lazy_preprocess True \
-    --dataloader_num_workers 4 
+    --dataloader_num_workers 4
