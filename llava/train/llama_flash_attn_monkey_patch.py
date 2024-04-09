@@ -3,8 +3,8 @@ import warnings
 
 import torch
 
-import transformers_sy
-from transformers_sy.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
+import transformers
+from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 
 try:
     from flash_attn.flash_attn_interface import flash_attn_unpadded_qkvpacked_func
@@ -109,7 +109,7 @@ def replace_llama_attn_with_flash_attn():
             "Flash attention is only supported on A100 or H100 GPU during training due to head dim > 64 backward."
             "ref: https://github.com/HazyResearch/flash-attention/issues/190#issuecomment-1523359593"
         )
-    transformers_sy.models.llama.modeling_llama.LlamaModel._prepare_decoder_attention_mask = (
+    transformers.models.llama.modeling_llama.LlamaModel._prepare_decoder_attention_mask = (
         _prepare_decoder_attention_mask
     )
-    transformers_sy.models.llama.modeling_llama.LlamaAttention.forward = forward
+    transformers.models.llama.modeling_llama.LlamaAttention.forward = forward

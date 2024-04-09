@@ -35,15 +35,43 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
     else:
         kwargs['torch_dtype'] = torch.float16
 
-    # this may be mm projector only
-    print('Loading LLaVA from base model...')
-    tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
-    cfg_pretrained = AutoConfig.from_pretrained(model_base)
-    model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
+    # Load LLaVA model
+    if model_base is None:
+        raise ValueError('There is `lora` in model name but no `model_base` is provided. If you are loading a LoRA model, please provide the `model_base` argument. Detailed instruction: https://github.com/haotian-liu/LLaVA#launch-a-model-worker-lora-weights-unmerged.')
+    if model_base is not None:
+        lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
+        print('Loading LLaVA from base model...')
+        model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
+        token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
+        if model.lm_head.weight.shape[0] != token_num:
+            model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
+            model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
 
-    # mm_projector_weights = torch.load(os.path.join(model_path, 'mm_projector.bin'), map_location='cpu')
-    # mm_projector_weights = {k: v.to(torch.float16) for k, v in mm_projector_weights.items()}
-    # model.load_state_dict(mm_projector_weights, strict=False)
+        print('Loading additional LLaVA weights...')
+        if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
+            non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
+        else:
+            # this is probably from HF Hub
+            from huggingface_hub import hf_hub_download
+            def load_from_hf(repo_id, filename, subfolder=None):
+                cache_file = hf_hub_download(
+                    repo_id=repo_id,
+                    filename=filename,
+                    subfolder=subfolder)
+                return torch.load(cache_file, map_location='cpu')
+            non_lora_trainables = load_from_hf(model_path, 'non_lora_trainables.bin')
+        non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in non_lora_trainables.items()}
+        if any(k.startswith('model.model.') for k in non_lora_trainables):
+            non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
+        model.load_state_dict(non_lora_trainables, strict=False)
+
+        from peft import PeftModel
+        print('Loading LoRA weights...')
+        model = PeftModel.from_pretrained(model, model_path)
+        print('Merging LoRA weights...')
+        model = model.merge_and_unload()
+        print('Model is loaded...')
 
     image_processor = None
 
@@ -130,13 +158,6 @@ def eval_model(args):
 
     # questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
     questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
-
-    if '100_examples' in args.question_file:
-        for each in questions:
-            tem = each['conversations'][0]['value']
-            tem = tem.replace('<image>', '').strip()
-            tem = tem + ' Please reply with only the answer, such as the number or theme.' + '\n<image>'
-            each['conversations'][0]['value'] = tem
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     answers_file = os.path.expanduser(args.answers_file)
     os.makedirs(os.path.dirname(answers_file), exist_ok=True)
@@ -163,7 +184,7 @@ def eval_model(args):
                 temperature=args.temperature,
                 top_p=args.top_p,
                 num_beams=args.num_beams,
-                max_new_tokens=1024,
+                max_new_tokens=1636,
                 use_cache=True)
 
         input_token_len = input_ids.shape[1]

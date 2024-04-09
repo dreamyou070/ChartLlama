@@ -3,8 +3,8 @@ import torch
 
 from torch.utils.data import Sampler
 
-from transformers_sy import Trainer
-from transformers_sy.trainer import (
+from transformers import Trainer
+from transformers.trainer import (
     has_length,
 )
 from typing import List, Optional
@@ -149,7 +149,7 @@ class LLaVATrainer(Trainer):
 
     def _save_checkpoint(self, model, trial, metrics=None):
         if getattr(self.args, 'tune_mm_mlp_adapter', False):
-            from transformers_sy.trainer_utils import PREFIX_CHECKPOINT_DIR
+            from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
             checkpoint_folder = f"{PREFIX_CHECKPOINT_DIR}-{self.state.global_step}"
 
             run_dir = self._get_output_dir(trial=trial)
