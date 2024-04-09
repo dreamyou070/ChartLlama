@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # [1] model argument (what is mm ?)
-model_name_or_path="/mnt/gyfs/yuchenghan/llama2_models/vicuna-13b-v1.5"
+#model_name_or_path="/mnt/gyfs/yuchenghan/llama2_models/vicuna-13b-v1.5"
+model_name_or_path="lmsys/llama2_models/vicuna-13b-v1.5"
 version="v1"
 vision_tower="/mnt/share_1227775/yandali/multimodal/models/ft_local/clip-vit-large-patch14-336/"
 pretrain_mm_mlp_adapter="/mnt/private_yucheng/huggingface_hub/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin"
