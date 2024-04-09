@@ -38,32 +38,31 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
     if model_base is None:
         raise ValueError('There is `lora` in model name but no `model_base` is provided. If you are loading a LoRA model, please provide the `model_base` argument. Detailed instruction: https://github.com/haotian-liu/LLaVA#launch-a-model-worker-lora-weights-unmerged.')
     if model_base is not None:
-        # [1] tokenizer (make lora config)
+        print(f' [1] tokenizer (make lora config)')
         tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
 
-        # [2] loading base model (with lora config) (lora from model_path)
+        print(f' [2] loading lora config)')
         lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
+        lora_cfg_pretrained['mm_vision_tower'] = 'openai/clip-vit-large-patch14-336'
         print(f'lora_cfg_pretrained: {lora_cfg_pretrained}')
+        print(f' [3] base model')
         model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                       low_cpu_mem_usage=True,
                                                       config=lora_cfg_pretrained,
                                                       **kwargs)
-
-
         token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
         if model.lm_head.weight.shape[0] != token_num:
             model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
             model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
 
-        print('Loading additional LLaVA weights...')
+        print(f' [3.2] lora zero file')
         if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
             non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
         else:
             # this is probably from HF Hub
             from huggingface_hub import hf_hub_download
             def load_from_hf(repo_id, filename, subfolder=None):
-                cache_file = hf_hub_download(
-                    repo_id=repo_id,
+                cache_file = hf_hub_download(repo_id=repo_id,
                     filename=filename,
                     subfolder=subfolder)
                 return torch.load(cache_file, map_location='cpu')
