@@ -30,8 +30,7 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             load_in_4bit=True,
             bnb_4bit_compute_dtype=torch.float16,
             bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type='nf4'
-        )
+            bnb_4bit_quant_type='nf4')
     else:
         kwargs['torch_dtype'] = torch.float16
 
@@ -39,10 +38,18 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
     if model_base is None:
         raise ValueError('There is `lora` in model name but no `model_base` is provided. If you are loading a LoRA model, please provide the `model_base` argument. Detailed instruction: https://github.com/haotian-liu/LLaVA#launch-a-model-worker-lora-weights-unmerged.')
     if model_base is not None:
-        lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
+        # [1] tokenizer (make lora config)
         tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
-        print('Loading LLaVA from base model...')
-        model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
+
+        # [2] loading base model (with lora config) (lora from model_path)
+        lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)
+        print(f'lora_cfg_pretrained: {lora_cfg_pretrained}')
+        model = LlavaLlamaForCausalLM.from_pretrained(model_base,
+                                                      low_cpu_mem_usage=True,
+                                                      config=lora_cfg_pretrained,
+                                                      **kwargs)
+
+
         token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
         if model.lm_head.weight.shape[0] != token_num:
             model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
@@ -155,7 +162,11 @@ def eval_model(args):
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
-    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
+    # model_name ? vicuna-13b-v1.5
+    # model_path =
+    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
+                                                                           args.model_base,
+                                                                           model_name)
 
     print(f'\n step 2. QA files')
     questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
@@ -210,8 +221,9 @@ def eval_model(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", type=str, required=True)
-    parser.add_argument("--question-file", type=str, required=True)
     parser.add_argument("--model-base", type=str, default='/mnt/private_yucheng/huggingface_hub/llava-v1.5-13b')
+
+    parser.add_argument("--question-file", type=str, required=True)
     parser.add_argument("--image-folder", type=str, default="/mnt/private_yucheng/chartgpt/LLaVA/playground/data")
     parser.add_argument("--answers-file", type=str, default="answer.jsonl")
     parser.add_argument("--conv-mode", type=str, default="v1")
