@@ -785,8 +785,7 @@ def train():
             config.attn_config['attn_impl'] = training_args.mpt_attn_impl
             model = LlavaMPTForCausalLM.from_pretrained(model_args.model_name_or_path, config=config,
                                                    cache_dir=training_args.cache_dir,  **bnb_model_from_pretrained_args)
-        else: # mm_projector_type = mp2x_gelu ??
-
+        else:
             model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
                                                             cache_dir=training_args.cache_dir,
                                                           **bnb_model_from_pretrained_args)
@@ -807,24 +806,31 @@ def train():
             def make_inputs_require_grad(module, input, output):
                 output.requires_grad_(True)
             model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
+
     print(f' (2.2) lora model')
     if training_args.lora_enable:
+        # [5.1] lora for llama
         from peft import LoraConfig, get_peft_model
-        lora_config = LoraConfig(r=training_args.lora_r, lora_alpha=training_args.lora_alpha,
-        target_modules=find_all_linear_names(model), lora_dropout=training_args.lora_dropout, bias=training_args.lora_bias,task_type="CAUSAL_LM",)
+        lora_config = LoraConfig(r=training_args.lora_r,
+                                 lora_alpha=training_args.lora_alpha,
+                                 target_modules=find_all_linear_names(model),
+                                 lora_dropout=training_args.lora_dropout, bias=training_args.lora_bias,task_type="CAUSAL_LM",)
         if training_args.bits == 16:
-            if training_args.bf16: model.to(torch.bfloat16)
-            if training_args.fp16: model.to(torch.float16)
+            if training_args.bf16:
+                model.to(torch.bfloat16)
+            if training_args.fp16:
+                model.to(torch.float16)
         rank0_print("Adding LoRA adapters...")
-        model = get_peft_model(model, lora_config)
+        model = get_peft_model(model=model,
+                               peft_config = lora_config,
+                               adapter_name = 'llama_adaoper_lora')
     print(f' (2.3) tokenizer')
     if 'mpt' in model_args.model_name_or_path:
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
                cache_dir=training_args.cache_dir, model_max_length=training_args.model_max_length, padding_side="right")
     else:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
-                cache_dir=training_args.cache_dir,model_max_length=training_args.model_max_length, padding_side="right",
-                                                               use_fast=False,)
+        tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path, cache_dir=training_args.cache_dir,
+                                 model_max_length=training_args.model_max_length, padding_side="right", use_fast=False,)
     if model_args.version == "v0":
         if tokenizer.pad_token is None:
             smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"), tokenizer=tokenizer, model=model,)
@@ -836,6 +842,7 @@ def train():
             conversation_lib.default_conversation = conversation_lib.conv_templates[model_args.version] # conv_vicuna_v1
         else:
             conversation_lib.default_conversation = conversation_lib.conv_templates["vicuna_v1"]
+    # ------------------------------------------------------------------------------------------------------------------
     print(f' (2.4) vision tower model')
     if model_args.vision_tower is not None:
         model.get_model().initialize_vision_modules(model_args=model_args, fsdp=training_args.fsdp)
@@ -855,9 +862,7 @@ def train():
             for p in model.get_model().mm_projector.parameters():
                 p.requires_grad = False
 
-        if model_args.lora_further_tune_finetuned:
-            # [1] pretrain step : only adapter training
-            # [2] fine-tuning step : adapter and LLM training
+        if model_args.lora_further_tune_finetuned: # this is for vision lora, but it is not used...
             for p in model.get_model().mm_projector.parameters():
                 p.requires_grad=True
         if training_args.bits in [4, 8]:

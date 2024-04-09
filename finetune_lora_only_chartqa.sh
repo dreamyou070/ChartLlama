@@ -48,5 +48,4 @@ deepspeed train.py \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
-    --mm_use_im_patch_token False \
-    --lora_further_tune_finetuned True
+    --mm_use_im_patch_token False
