@@ -27,8 +27,8 @@ deepspeed llava/train/train.py \
     --data_path /mnt/private_yucheng/chartgpt/LLaVA/playground/llava_mix_plus_chartqa.json \
     --image_folder /mnt/private_yucheng/chartgpt/LLaVA/playground/data \
     --image_aspect_ratio pad \
-    --fp16 True \
     --lora_r 64 \
+    --fp16 True \
     --output_dir ./checkpoints/llava_mix_plus_chartqa \
     --num_train_epochs 1 \
     --per_device_train_batch_size 2 \
