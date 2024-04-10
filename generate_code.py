@@ -201,8 +201,8 @@ def eval_model(args):
 
     print(f'\n step 1. model')
     disable_torch_init()
-    #model_path = os.path.expanduser(args.model_path)  # model_path = "listen2you002/ChartLlama-13b"
-    #model_name = get_model_name_from_path(model_path) #
+    model_path = os.path.expanduser(args.model_path)  # model_path = "listen2you002/ChartLlama-13b"
+    model_name = get_model_name_from_path(model_path) #
     print(f' (1.0) device')
     model_base = args.model_base
     device = "cuda"
