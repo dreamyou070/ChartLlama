@@ -199,22 +199,13 @@ def find_all_linear_names(model):
 
 def eval_model(args):
 
-    print(f'\n step 1. parse arguments and dtype')
+    print(f'\n step 1. model')
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
-
-
-    # model_name ? vicuna-13b-v1.5
-    # model_path =
-    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
-                                                                           args.model_base,
-                                                                           model_name)
-
+    print(f' (1.0) device')
     model_base = args.model_base
     device = "cuda"
-
-    print(f' (1.0) device')
     device_map = "auto"
     load_8bit = False
     load_4bit = False
@@ -235,22 +226,24 @@ def eval_model(args):
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
     print(f' (1.1.2) base model with lora')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
-    print(f'lora_cfg_pretrained = {lora_cfg_pretrained}')
+    # lora_cfg
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
     model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                   low_cpu_mem_usage=True,
                                                   config=lora_cfg_pretrained,
                                                   **kwargs)
+    print(f' (1.1.3) tokenizer')
+    token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features
+    if model.lm_head.weight.shape[0] != token_num:
+        model.lm_head.weight = torch.nn.Parameter(
+            torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
+        model.model.embed_tokens.weight = torch.nn.Parameter(
+            torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
 
 
     """
     
-    token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
-    if model.lm_head.weight.shape[0] != token_num:
-        model.lm_head.weight = torch.nn.Parameter(
-            torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
-        model.model.embed_tokens.weight = torch.nn.Parameter(
-            torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
+    
 
     print(f' [3.2] lora zero file')
     if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
