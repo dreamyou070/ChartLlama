@@ -5,7 +5,7 @@ CHUNKS=1
 IDX=0
 
 question_file=r"./data/vistext/vistext_qa.json"
-image_folder=r"./data/vistext/sy"
+image_folder=r"./data/vistext"
 answers_file=r"./data/vistext/sy_answer.json"
 vision_tower="openai/clip-vit-large-patch14-336"
 # head ...  ?
@@ -17,8 +17,8 @@ CUDA_VISIBLE_DEVICES=1 \
   --model_path "listen2you002/ChartLlama-13b" \
   --vision_tower "${vision_tower}" \
   --question_file "${question_file}" \
-  --image_folder "./data/ChartLlama-Dataset/ours" \
-  --answers_file "./data/ChartLlama-Dataset/answer/box_chart_answer.json" \
+  --image_folder "${image_folder}" \
+  --answers_file "${answers_fil}" \
   --num-chunks $CHUNKS \
   --chunk-idx $IDX \
   --temperature 0 \
