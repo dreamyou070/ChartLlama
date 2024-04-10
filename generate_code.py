@@ -275,7 +275,7 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    vision_tower.to(device=device, dtype=torch.float16)
+    vision_tower.to(device=model.device, dtype=torch.float16)
     image_processor = vision_tower.image_processor
     if hasattr(model.config, "max_sequence_length"): # if model.config
         context_len = model.config.max_sequence_length
