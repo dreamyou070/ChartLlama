@@ -272,8 +272,7 @@ def eval_model(args):
     model.resize_token_embeddings(len(tokenizer))
 
     print(f' (1.1.6) vision model')
-    vision_tower = model.get_vision_tower()
-    print(f' - vision_tower.is_loaded = {vision_tower.is_loaded}')
+    vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
     vision_tower.to(device=device, dtype=torch.float16)
@@ -292,15 +291,15 @@ def eval_model(args):
         total_questions.append(elem)
     print(f' - total_questions = {total_questions}')
 
-
-    """
     answers_file = os.path.expanduser(args.answers_file)
     os.makedirs(os.path.dirname(answers_file), exist_ok=True)
     ans_file = open(answers_file, "w")
+
+    """
+    
     if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
         args.conv_mode = args.conv_mode + '_mmtag'
-        print(
-            f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
+        print(f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
     data_loader = create_data_loader(questions,
                                      args.image_folder,
                                      tokenizer,
