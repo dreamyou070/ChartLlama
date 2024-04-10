@@ -245,18 +245,17 @@ def eval_model(args):
             cache_file = hf_hub_download(repo_id=repo_id, filename=filename, subfolder=subfolder)
             return torch.load(cache_file, map_location='cpu')
         non_lora_trainables = load_from_hf(model_path, 'non_lora_trainables.bin')
-
-    non_lora_dict = {}
-    for k, v in non_lora_trainables.items():
-        if k.startswith('base_model.'): # erase bas_model.
-            k = k[11:]
-        print(f'non_lora_trainables: {k}')
-        non_lora_dict[k] = v
-
+    # filling mm_projector !
+    # model.model.mm_projector.0.weight
+    # model.model.mm_projector.0.bias
+    # model.model.mm_projector.2.weight
+    # model.model.mm_projector.2.bias
     non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in
                            non_lora_trainables.items()}
     if any(k.startswith('model.model.') for k in non_lora_trainables):
         non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
+    for k, v in non_lora_trainables.items():
+        print(f'filling {k}')
     model.load_state_dict(non_lora_trainables, strict=False)
     """
     
