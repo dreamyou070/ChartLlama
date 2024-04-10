@@ -285,7 +285,7 @@ def eval_model(args):
     print(f'\n step 2. code generating instruction files')
     questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
     total_questions = []
-    chunk_size = math.ceil(len(questions) / args.num_chunk)
+    chunk_size = math.ceil(len(questions) / args.num_chunks)
     for i in range(0, len(questions), chunk_size) :
         elem = questions[i:i + chunk_size]
         total_questions.append(elem)
