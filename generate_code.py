@@ -283,8 +283,31 @@ def eval_model(args):
     else: # context_len = 2048
         context_len = 2048
 
-    print(f'\n step 2. Task')
-    
+    print(f'\n step 2. code generating instruction files')
+    questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
+    total_questions = []
+    chunk_size = math.ceil(len(questions) / args.num_chunk)
+    for i in range(0, len(questions), chunk_size) :
+        elem = questions[i:i + chunk_size]
+        total_questions.append(elem)
+    print(f' - total_questions = {total_questions}')
+
+
+    """
+    answers_file = os.path.expanduser(args.answers_file)
+    os.makedirs(os.path.dirname(answers_file), exist_ok=True)
+    ans_file = open(answers_file, "w")
+    if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
+        args.conv_mode = args.conv_mode + '_mmtag'
+        print(
+            f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
+    data_loader = create_data_loader(questions,
+                                     args.image_folder,
+                                     tokenizer,
+                                     image_processor,
+                                     model.config)
+    """
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

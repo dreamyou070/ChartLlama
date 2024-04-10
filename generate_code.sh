@@ -16,7 +16,7 @@ CUDA_VISIBLE_DEVICES=1 \
   --model_base "lmsys/vicuna-13b-v1.5" \
   --model_path "listen2you002/ChartLlama-13b" \
   --vision_tower "${vision_tower}" \
-  --question_file "./data/ChartLlama-Dataset/ours/box_chart_100examples_simplified_qa.json" \
+  --question_file "${question_file}" \
   --image_folder "./data/ChartLlama-Dataset/ours" \
   --answers_file "./data/ChartLlama-Dataset/answer/box_chart_answer.json" \
   --num-chunks $CHUNKS \
