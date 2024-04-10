@@ -99,7 +99,7 @@ def load_pretrained_model(model_path, model_base,
     if not vision_tower.is_loaded:
         vision_tower.load_model()
     # what is device ?
-    vision_tower.to(device=device, dtype=torch.float16)
+    vision_tower.to(device=model.device, dtype=torch.float16)
     image_processor = vision_tower.image_processor
 
     if hasattr(model.config, "max_sequence_length"):
