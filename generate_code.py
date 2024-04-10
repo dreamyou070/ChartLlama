@@ -204,156 +204,31 @@ def create_data_loader(questions, image_folder, tokenizer, image_processor, mode
     data_loader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False)
     return data_loader
 
+def find_all_linear_names(model):
+    cls = torch.nn.Linear
+    lora_module_names = set()
+    for name, module in model.named_modules():
+        if isinstance(module, cls):
+            names = name.split('.')
+            # in case you load the whole model
+            if 'mm_projector' in names:
+                # on mm_projector, skip
+                continue
+            print(f'lora on {names[0]}')
+            lora_module_names.add(names[0] if len(names) == 1 else names[-1])
+    if 'lm_head' in lora_module_names: # needed for 16-bit
+        lora_module_names.remove('lm_head')
+    return list(lora_module_names)
+
 
 def eval_model(args):
 
     print(f'\n step 1. parse arguments and dtype')
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments))
-    print(f' (1) model / data argument')
-    model_args, data_args = parser.parse_args_into_dataclasses()
-
-    # ----------------------------------------------------------------------------------------------------------------- #
-    print(f'\n step 2. make model')
-    print(f' (2.1) base model')
-    bnb_model_from_pretrained_args = {}
-    if model_args.vision_tower is not None:  # llava model
-        model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
-                                                      **bnb_model_from_pretrained_args)
-    model.config.use_cache = False
-    model.model.requires_grad_(False)
-    lora_config = LoraConfig(r=64,
-                             lora_alpha=16,
-                             target_modules=find_all_linear_names(model),
-                             lora_dropout=training_args.lora_dropout,
-                             bias=training_args.lora_bias,
-                             task_type="CAUSAL_LM", )
-    model = get_peft_model(model=model,
-                               peft_config=lora_config,
-                               adapter_name='llama_adaoper_lora')
-    print(f' (2.3) tokenizer')
-    tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
-                                                               cache_dir=training_args.cache_dir,
-                                                               model_max_length=training_args.model_max_length,
-                                                               padding_side="right", use_fast=False, )
-    if model_args.version == "v0":
-        if tokenizer.pad_token is None:
-            smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"), tokenizer=tokenizer,
-                                                 model=model, )
-    elif model_args.version == "v0.5":
-        tokenizer.pad_token = tokenizer.unk_token
-    else:
-        tokenizer.pad_token = tokenizer.unk_token
-        if model_args.version in conversation_lib.conv_templates:
-            conversation_lib.default_conversation = conversation_lib.conv_templates[
-                model_args.version]  # conv_vicuna_v1
-        else:
-            conversation_lib.default_conversation = conversation_lib.conv_templates["vicuna_v1"]
-    # ------------------------------------------------------------------------------------------------------------------
-    print(f' (2.4) vision tower model')
-    if model_args.vision_tower is not None:
-        model.get_model().initialize_vision_modules(model_args=model_args, fsdp=training_args.fsdp)
-        vision_tower = model.get_vision_tower()
-        vision_tower.to(dtype=torch.bfloat16 if training_args.bf16 else torch.float16, device=training_args.device)
-        data_args.image_processor = vision_tower.image_processor
-        data_args.is_multimodal = True
-        model.config.image_aspect_ratio = data_args.image_aspect_ratio
-        model.config.image_grid_pinpoints = data_args.image_grid_pinpoints
-        model.config.tune_mm_mlp_adapter = training_args.tune_mm_mlp_adapter = model_args.tune_mm_mlp_adapter
-        if model_args.tune_mm_mlp_adapter:
-            model.requires_grad_(False)
-            for p in model.get_model().mm_projector.parameters():
-                p.requires_grad = True
-        model.config.freeze_mm_mlp_adapter = training_args.freeze_mm_mlp_adapter
-        if training_args.freeze_mm_mlp_adapter:
-            for p in model.get_model().mm_projector.parameters():
-                p.requires_grad = False
-
-        if model_args.lora_further_tune_finetuned:  # this is for vision lora, but it is not used...
-            for p in model.get_model().mm_projector.parameters():
-                p.requires_grad = True
-        if training_args.bits in [4, 8]:
-            model.get_model().mm_projector.to(dtype=compute_dtype, device=training_args.device)
-        model.config.mm_use_im_start_end = data_args.mm_use_im_start_end = model_args.mm_use_im_start_end
-        training_args.use_im_start_end = model_args.mm_use_im_start_end
-        model.config.mm_use_im_patch_token = model_args.mm_use_im_patch_token
-        model.initialize_vision_tokenizer(model_args, tokenizer=tokenizer)
-    if training_args.bits in [4, 8]:
-        from peft.tuners.lora import LoraLayer
-        for name, module in model.named_modules():
-            if isinstance(module, LoraLayer):
-                if training_args.bf16:
-                    module = module.to(torch.bfloat16)
-            if 'norm' in name:
-                module = module.to(torch.float32)
-            if 'lm_head' in name or 'embed_tokens' in name:
-                if hasattr(module, 'weight'):
-                    if training_args.bf16 and module.weight.dtype == torch.float32:
-                        module = module.to(torch.bfloat16)
+    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
 
 
-
-    print(f'\n step 1. model')
-    disable_torch_init()
-    model_path = os.path.expanduser(args.model_path)
-    model_name = get_model_name_from_path(model_path)
-    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
-                                                                           args.model_base,
-                                                                           model_name)
-
-    print(f'\n step 2. QA files')
-    questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
-    questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
-    answers_file = os.path.expanduser(args.answers_file)
-    os.makedirs(os.path.dirname(answers_file), exist_ok=True)
-    ans_file = open(answers_file, "w")
-    if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
-        args.conv_mode = args.conv_mode + '_mmtag'
-        print(f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
-    data_loader = create_data_loader(questions,
-                                     args.image_folder,
-                                     tokenizer,
-                                     image_processor,
-                                     model.config)
-
-
-    print(f'\n step 3. Inference')
-    for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
-        idx = line["id"]
-        cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
-
-        stop_str = conv_templates[args.conv_mode].sep if conv_templates[args.conv_mode].sep_style != SeparatorStyle.TWO else conv_templates[args.conv_mode].sep2
-        input_ids = input_ids.to(device='cuda', non_blocking=True)
-
-        with torch.inference_mode():
-            output_ids = model.generate(
-                input_ids,
-                images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
-                do_sample=True if args.temperature > 0 else False,
-                temperature=args.temperature,
-                top_p=args.top_p,
-                num_beams=args.num_beams,
-                max_new_tokens=1636,
-                use_cache=True)
-
-        input_token_len = input_ids.shape[1]
-        n_diff_input_output = (input_ids != output_ids[:, :input_token_len]).sum().item()
-        if n_diff_input_output > 0:
-            print(f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids')
-        outputs = tokenizer.batch_decode(output_ids[:, input_token_len:], skip_special_tokens=True)[0]
-        outputs = outputs.strip()
-        if outputs.endswith(stop_str):
-            outputs = outputs[:-len(stop_str)]
-        outputs = outputs.strip()
-
-        ans_id = shortuuid.uuid()
-        ans_file.write(json.dumps({"question_id": idx,
-                                   "prompt": cur_prompt,
-                                   "text": outputs,
-                                   "answer_id": ans_id,
-                                   "model_id": model_name,
-                                   "metadata": {}}) + "\n")
-        ans_file.flush()
-    ans_file.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
