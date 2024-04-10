@@ -19,32 +19,8 @@ import math
 from typing import Optional, List, Dict
 from dataclasses import dataclass, field
 import transformers
+from transformers import BitsAndBytesConfig
 from peft import LoraConfig, get_peft_model
-@dataclass
-class ModelArguments:
-    model_name_or_path: Optional[str] = field(default="facebook/opt-125m")
-    version: Optional[str] = field(default="v0")
-    freeze_backbone: bool = field(default=False)
-    tune_mm_mlp_adapter: bool = field(default=False)
-    lora_further_tune_finetuned: bool = field(default=False)
-    vision_tower: Optional[str] = field(default=None)
-    mm_vision_select_layer: Optional[int] = field(default=-1)   # default to the last layer
-    pretrain_mm_mlp_adapter: Optional[str] = field(default=None)
-    mm_projector_type: Optional[str] = field(default='linear') # mlp2x_gelu
-    mm_use_im_start_end: bool = field(default=False)
-    mm_use_im_patch_token: bool = field(default=True)
-    mm_vision_select_feature: Optional[str] = field(default="patch")
-
-
-@dataclass
-class DataArguments:
-    data_path: str = field(default=None,
-                           metadata={"help": "Path to the training data."})
-    lazy_preprocess: bool = False
-    is_multimodal: bool = False
-    image_folder: Optional[str] = field(default=None)
-    image_aspect_ratio: str = 'square'
-    image_grid_pinpoints: Optional[str] = field(default=None)
 
 
 def load_pretrained_model(model_path, model_base,
@@ -224,15 +200,122 @@ def find_all_linear_names(model):
 def eval_model(args):
 
     print(f'\n step 1. parse arguments and dtype')
-    parser = transformers.HfArgumentParser((ModelArguments, DataArguments))
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
+    disable_torch_init()
+    model_path = os.path.expanduser(args.model_path)
+    model_name = get_model_name_from_path(model_path)
+
+
+    # model_name ? vicuna-13b-v1.5
+    # model_path =
+    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
+                                                                           args.model_base,
+                                                                           model_name)
+
+    model_base = args.model_base
+    device = "cuda"
+
+    print(f' (1.0) device')
+    device_map = "auto"
+    load_8bit = False
+    load_4bit = False
+    kwargs = {"device_map": device_map}
+    if load_8bit:
+        kwargs['load_in_8bit'] = True
+    elif load_4bit:
+        kwargs['load_in_4bit'] = True
+        kwargs['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True,
+                                                           bnb_4bit_compute_dtype=torch.float16,
+                                                           bnb_4bit_use_double_quant=True,
+                                                           bnb_4bit_quant_type='nf4')
+    else:
+        kwargs['torch_dtype'] = torch.float16
+
+    print(f' (1.1) Llava model')
+    print(f' (1.1.1) tokenizer')
+    tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
+    print(f' (1.1.2) llava lora')
+    lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
+    print(f'lora_cfg_pretrained = {lora_cfg_pretrained}')
+    """
+    lora_cfg_pretrained.mm_vision_tower = args.vision_tower
+
+    print(f' [3.1] base model with lora')
+    model = LlavaLlamaForCausalLM.from_pretrained(model_base,
+                                                  low_cpu_mem_usage=True,
+                                                  config=lora_cfg_pretrained,
+                                                  **kwargs)
+    token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
+    if model.lm_head.weight.shape[0] != token_num:
+        model.lm_head.weight = torch.nn.Parameter(
+            torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
+        model.model.embed_tokens.weight = torch.nn.Parameter(
+            torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
+
+    print(f' [3.2] lora zero file')
+    if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
+        non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
+    else:
+        from huggingface_hub import hf_hub_download
+        def load_from_hf(repo_id, filename, subfolder=None):
+            cache_file = hf_hub_download(repo_id=repo_id,
+                                         filename=filename,
+                                         subfolder=subfolder)
+            return torch.load(cache_file, map_location='cpu')
+
+        non_lora_trainables = load_from_hf(model_path, 'non_lora_trainables.bin')
+    non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in
+                           non_lora_trainables.items()}
+    if any(k.startswith('model.model.') for k in non_lora_trainables):
+        non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
+    model.load_state_dict(non_lora_trainables, strict=False)
+
+    print(f' [3.3] loading lora weights and merging')
+    # parameter efficient
+    from peft import PeftModel
+    model = PeftModel.from_pretrained(model, model_path)
+    model = model.merge_and_unload()
+    print('Model is loaded...')
+
+    print(f' [4] tokenizer agumenting with patch token')
+    image_processor = None
+    mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)
+    mm_use_im_patch_token = getattr(model.config, "mm_use_im_patch_token", True)
+    if mm_use_im_patch_token:
+        tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
+    if mm_use_im_start_end:
+        tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
+    model.resize_token_embeddings(len(tokenizer))
+
+    print(f' [5] vision model')
+    vision_tower = model.get_vision_tower()
+    if not vision_tower.is_loaded:
+        vision_tower.load_model()
+    # what is device ?
+    vision_tower.to(device=device, dtype=torch.float16)
+    image_processor = vision_tower.image_processor
+
+    if hasattr(model.config, "max_sequence_length"):
+        context_len = model.config.max_sequence_length
+    else:
+        context_len = 2048
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
     print(f'\n step 2. make model')
     print(f' (2.1) base model')
     bnb_model_from_pretrained_args = {}
     if training_args.bits in [4, 8]:  # light model
-        from transformers import BitsAndBytesConfig
         bnb_model_from_pretrained_args.update(
             dict(device_map={"": training_args.device}, load_in_4bit=training_args.bits == 4,
                  load_in_8bit=training_args.bits == 8,
@@ -262,6 +345,7 @@ def eval_model(args):
     if model_args.freeze_backbone:
         model.model.requires_grad_(False)
     print(f' (2.2) base model')
+    """
 
 
 
