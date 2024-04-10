@@ -224,49 +224,45 @@ def eval_model(args):
     print(f' (1.1) Llava model')
     print(f' (1.1.1) tokenizer')
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
-    print(f' (1.1.2) base model with lora')
+    print(f' (1.1.2) base model with lora (no vision head trained param yet)')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
-    print(f' - lora_cfg_pretrained = {lora_cfg_pretrained}')
-    # config has vision head, but there is no vision head pretrained in model base ...
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
-    model = LlavaLlamaForCausalLM.from_pretrained(model_base,
-                                                  low_cpu_mem_usage=True,
-                                                  config=lora_cfg_pretrained,
-                                                  **kwargs)
-    print(f' (1.1.3) tokenizer')
-    token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features
-    # lm_head in features = token_dim
-    # lm_head out features = token_num
-    print(f' - token_num = {token_num}, token_dim = {token_dim}')
+    model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True,
+                                                  config=lora_cfg_pretrained, **kwargs)
+    token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
         model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
                                                               device=model.device, dtype=model.dtype))
-        model.model.embed_tokens.weight = torch.nn.Parameter(
-            torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
-
-
-    """
-    
-    
-
-    print(f' [3.2] lora zero file')
+        model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
+                                                                         device=model.device, dtype=model.dtype))
+    print(f' (1.1.3) lora zero file')
     if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
         non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
     else:
         from huggingface_hub import hf_hub_download
         def load_from_hf(repo_id, filename, subfolder=None):
-            cache_file = hf_hub_download(repo_id=repo_id,
-                                         filename=filename,
-                                         subfolder=subfolder)
+            cache_file = hf_hub_download(repo_id=repo_id, filename=filename, subfolder=subfolder)
             return torch.load(cache_file, map_location='cpu')
-
         non_lora_trainables = load_from_hf(model_path, 'non_lora_trainables.bin')
+
+    non_lora_dict = {}
+    for k, v in non_lora_trainables.items():
+        if k.startswith('base_model.'): # erase bas_model.
+            k = k[11:]
+        print(f'non_lora_trainables: {k}')
+        non_lora_dict[k] = v
+
     non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in
                            non_lora_trainables.items()}
     if any(k.startswith('model.model.') for k in non_lora_trainables):
         non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
     model.load_state_dict(non_lora_trainables, strict=False)
+    """
+    
+    
+
+    
 
     print(f' [3.3] loading lora weights and merging')
     # parameter efficient
