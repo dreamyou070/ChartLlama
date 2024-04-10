@@ -16,6 +16,36 @@ from llava.mm_utils import tokenizer_image_token, process_images, get_model_name
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import math
+from typing import Optional, List, Dict
+from dataclasses import dataclass, field
+import transformers
+from peft import LoraConfig, get_peft_model
+@dataclass
+class ModelArguments:
+    model_name_or_path: Optional[str] = field(default="facebook/opt-125m")
+    version: Optional[str] = field(default="v0")
+    freeze_backbone: bool = field(default=False)
+    tune_mm_mlp_adapter: bool = field(default=False)
+    lora_further_tune_finetuned: bool = field(default=False)
+    vision_tower: Optional[str] = field(default=None)
+    mm_vision_select_layer: Optional[int] = field(default=-1)   # default to the last layer
+    pretrain_mm_mlp_adapter: Optional[str] = field(default=None)
+    mm_projector_type: Optional[str] = field(default='linear') # mlp2x_gelu
+    mm_use_im_start_end: bool = field(default=False)
+    mm_use_im_patch_token: bool = field(default=True)
+    mm_vision_select_feature: Optional[str] = field(default="patch")
+
+
+@dataclass
+class DataArguments:
+    data_path: str = field(default=None,
+                           metadata={"help": "Path to the training data."})
+    lazy_preprocess: bool = False
+    is_multimodal: bool = False
+    image_folder: Optional[str] = field(default=None)
+    image_aspect_ratio: str = 'square'
+    image_grid_pinpoints: Optional[str] = field(default=None)
+
 
 def load_pretrained_model(model_path, model_base,
                           model_name, load_8bit=False, load_4bit=False,
@@ -176,6 +206,91 @@ def create_data_loader(questions, image_folder, tokenizer, image_processor, mode
 
 
 def eval_model(args):
+
+    print(f'\n step 1. parse arguments and dtype')
+    parser = transformers.HfArgumentParser((ModelArguments, DataArguments))
+    print(f' (1) model / data argument')
+    model_args, data_args = parser.parse_args_into_dataclasses()
+
+    # ----------------------------------------------------------------------------------------------------------------- #
+    print(f'\n step 2. make model')
+    print(f' (2.1) base model')
+    bnb_model_from_pretrained_args = {}
+    if model_args.vision_tower is not None:  # llava model
+        model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                      **bnb_model_from_pretrained_args)
+    model.config.use_cache = False
+    model.model.requires_grad_(False)
+    lora_config = LoraConfig(r=64,
+                             lora_alpha=16,
+                             target_modules=find_all_linear_names(model),
+                             lora_dropout=training_args.lora_dropout,
+                             bias=training_args.lora_bias,
+                             task_type="CAUSAL_LM", )
+    model = get_peft_model(model=model,
+                               peft_config=lora_config,
+                               adapter_name='llama_adaoper_lora')
+    print(f' (2.3) tokenizer')
+    tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
+                                                               cache_dir=training_args.cache_dir,
+                                                               model_max_length=training_args.model_max_length,
+                                                               padding_side="right", use_fast=False, )
+    if model_args.version == "v0":
+        if tokenizer.pad_token is None:
+            smart_tokenizer_and_embedding_resize(special_tokens_dict=dict(pad_token="[PAD]"), tokenizer=tokenizer,
+                                                 model=model, )
+    elif model_args.version == "v0.5":
+        tokenizer.pad_token = tokenizer.unk_token
+    else:
+        tokenizer.pad_token = tokenizer.unk_token
+        if model_args.version in conversation_lib.conv_templates:
+            conversation_lib.default_conversation = conversation_lib.conv_templates[
+                model_args.version]  # conv_vicuna_v1
+        else:
+            conversation_lib.default_conversation = conversation_lib.conv_templates["vicuna_v1"]
+    # ------------------------------------------------------------------------------------------------------------------
+    print(f' (2.4) vision tower model')
+    if model_args.vision_tower is not None:
+        model.get_model().initialize_vision_modules(model_args=model_args, fsdp=training_args.fsdp)
+        vision_tower = model.get_vision_tower()
+        vision_tower.to(dtype=torch.bfloat16 if training_args.bf16 else torch.float16, device=training_args.device)
+        data_args.image_processor = vision_tower.image_processor
+        data_args.is_multimodal = True
+        model.config.image_aspect_ratio = data_args.image_aspect_ratio
+        model.config.image_grid_pinpoints = data_args.image_grid_pinpoints
+        model.config.tune_mm_mlp_adapter = training_args.tune_mm_mlp_adapter = model_args.tune_mm_mlp_adapter
+        if model_args.tune_mm_mlp_adapter:
+            model.requires_grad_(False)
+            for p in model.get_model().mm_projector.parameters():
+                p.requires_grad = True
+        model.config.freeze_mm_mlp_adapter = training_args.freeze_mm_mlp_adapter
+        if training_args.freeze_mm_mlp_adapter:
+            for p in model.get_model().mm_projector.parameters():
+                p.requires_grad = False
+
+        if model_args.lora_further_tune_finetuned:  # this is for vision lora, but it is not used...
+            for p in model.get_model().mm_projector.parameters():
+                p.requires_grad = True
+        if training_args.bits in [4, 8]:
+            model.get_model().mm_projector.to(dtype=compute_dtype, device=training_args.device)
+        model.config.mm_use_im_start_end = data_args.mm_use_im_start_end = model_args.mm_use_im_start_end
+        training_args.use_im_start_end = model_args.mm_use_im_start_end
+        model.config.mm_use_im_patch_token = model_args.mm_use_im_patch_token
+        model.initialize_vision_tokenizer(model_args, tokenizer=tokenizer)
+    if training_args.bits in [4, 8]:
+        from peft.tuners.lora import LoraLayer
+        for name, module in model.named_modules():
+            if isinstance(module, LoraLayer):
+                if training_args.bf16:
+                    module = module.to(torch.bfloat16)
+            if 'norm' in name:
+                module = module.to(torch.float32)
+            if 'lm_head' in name or 'embed_tokens' in name:
+                if hasattr(module, 'weight'):
+                    if training_args.bf16 and module.weight.dtype == torch.float32:
+                        module = module.to(torch.bfloat16)
+
+
 
     print(f'\n step 1. model')
     disable_torch_init()

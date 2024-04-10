@@ -8,6 +8,9 @@ question_file=r"./data/vistext/vistext_qa.json"
 image_folder=r"./data/vistext/sy"
 answers_file=r"./data/vistext/sy_answer.json"
 vision_tower="openai/clip-vit-large-patch14-336"
+# head ...  ?
+mm_projector_type="mlp2x_gelu"
+
 CUDA_VISIBLE_DEVICES=1 \
   python generate_code.py \
   --model_base "lmsys/vicuna-13b-v1.5" \

@@ -160,10 +160,10 @@ def find_all_linear_names(model):
             names = name.split('.')
             # in case you load the whole model
             if 'mm_projector' in names:
+                # on mm_projector, skip
                 continue
+            print(f'lora on {names[0]}')
             lora_module_names.add(names[0] if len(names) == 1 else names[-1])
-
-
     if 'lm_head' in lora_module_names: # needed for 16-bit
         lora_module_names.remove('lm_head')
     return list(lora_module_names)
@@ -824,15 +824,11 @@ def train():
                                  lora_alpha=training_args.lora_alpha,
                                  target_modules=find_all_linear_names(model),
                                  lora_dropout=training_args.lora_dropout, bias=training_args.lora_bias,task_type="CAUSAL_LM",)
-        if training_args.bits == 16:
-            if training_args.bf16:
-                model.to(torch.bfloat16)
-            if training_args.fp16:
-                model.to(torch.float16)
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model=model,
                                peft_config = lora_config,
                                adapter_name = 'llama_adaoper_lora')
+    """
     print(f' (2.3) tokenizer')
     if 'mpt' in model_args.model_name_or_path:
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_args.model_name_or_path,
@@ -910,7 +906,7 @@ def train():
     else:
         trainer.train()
 
-    """
+    
     print(f'\n [after training] step 6. save model')
     trainer.save_state()
     model.config.use_cache = True
