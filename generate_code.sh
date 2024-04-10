@@ -1,7 +1,6 @@
 #!/bin/bash
 
 pretrain_mm_mlp_adapter="/mnt/private_yucheng/huggingface_hub/llava-v1.5-mlp2x-336px-pretrain-vicuna-13b-v1.5/mm_projector.bin"
-data_path="/mnt/private_yucheng/chartgpt/LLaVA/playground/llava_mix_plus_chartqa.json"
 
 deepspeed generate_code.py \
   --deepspeed ./scripts/zero3.json \
@@ -15,9 +14,9 @@ deepspeed generate_code.py \
   --mm_use_im_start_end False \
   --mm_use_im_patch_token False \
   --mm_vision_select_layer -2 \
-  --data_path data/ChartLlama-Dataset/llava_mix_plus_chartqa.json \
-  --image_folder /mnt/private_yucheng/chartgpt/LLaVA/playground/data \
-  --image_aspect_ratio pad \
+  --question-file "./data/ChartLlama-Dataset/ours/box_chart_100examples_simplified_qa.json" \
+  --image-folder "./data/ChartLlama-Dataset/ours" \
+  --answers-file "./data/ChartLlama-Dataset/answer/box_chart_answer.json" \
   --lora_r 64 \
   --fp16 True \
   --output_dir ./checkpoints/llava_mix_plus_chartqa \
