@@ -4,9 +4,9 @@
 CHUNKS=1
 IDX=0
 
-question_file=r"./data/vistext/vistext_qa.json"
-image_folder=r"./data/vistext"
-answers_file=r"./data/vistext/sy_answer.json"
+question_file=r"data/vistext/vistext_qa.json"
+image_folder=r"data/vistext"
+answers_file=r"data/vistext/sy_answer.json"
 vision_tower="openai/clip-vit-large-patch14-336"
 # head ...  ?
 mm_projector_type="mlp2x_gelu"
