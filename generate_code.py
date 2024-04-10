@@ -228,6 +228,41 @@ def eval_model(args):
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
 
+    print(f'\n step 2. make model')
+    print(f' (2.1) base model')
+    bnb_model_from_pretrained_args = {}
+    if training_args.bits in [4, 8]:  # light model
+        from transformers import BitsAndBytesConfig
+        bnb_model_from_pretrained_args.update(
+            dict(device_map={"": training_args.device}, load_in_4bit=training_args.bits == 4,
+                 load_in_8bit=training_args.bits == 8,
+                 quantization_config=BitsAndBytesConfig(load_in_4bit=training_args.bits == 4,
+                                                        load_in_8bit=training_args.bits == 8,
+                                                        llm_int8_threshold=6.0,
+                                                        llm_int8_has_fp16_weight=False,
+                                                        bnb_4bit_compute_dtype=compute_dtype,
+                                                        bnb_4bit_use_double_quant=training_args.double_quant,
+                                                        bnb_4bit_quant_type=training_args.quant_type)))
+    if model_args.vision_tower is not None:  # llava model
+        if 'mpt' in model_args.model_name_or_path:  # mpt version
+            config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            config.attn_config['attn_impl'] = training_args.mpt_attn_impl
+            model = LlavaMPTForCausalLM.from_pretrained(model_args.model_name_or_path, config=config,
+                                                        cache_dir=training_args.cache_dir,
+                                                        **bnb_model_from_pretrained_args)
+        else: # llava version
+            model = LlavaLlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                          cache_dir=training_args.cache_dir,
+                                                          **bnb_model_from_pretrained_args)
+    else:  # just lama model
+        model = transformers.LlamaForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                              cache_dir=training_args.cache_dir,
+                                                              **bnb_model_from_pretrained_args)
+    model.config.use_cache = False
+    if model_args.freeze_backbone:
+        model.model.requires_grad_(False)
+    print(f' (2.2) base model')
+
 
 
 if __name__ == "__main__":
