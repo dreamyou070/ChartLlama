@@ -233,17 +233,18 @@ def eval_model(args):
     print(f' (1.1) Llava model')
     print(f' (1.1.1) tokenizer')
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
-    print(f' (1.1.2) llava lora')
+    print(f' (1.1.2) base model with lora')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
     print(f'lora_cfg_pretrained = {lora_cfg_pretrained}')
-    """
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
-
-    print(f' [3.1] base model with lora')
     model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                   low_cpu_mem_usage=True,
                                                   config=lora_cfg_pretrained,
                                                   **kwargs)
+
+
+    """
+    
     token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
     if model.lm_head.weight.shape[0] != token_num:
         model.lm_head.weight = torch.nn.Parameter(
