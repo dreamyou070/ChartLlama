@@ -19,7 +19,7 @@ CUDA_VISIBLE_DEVICES=1 \
   --question_file "${question_file}" \
   --image_folder "${image_folder}" \
   --answers_file "${answers_fil}" \
-  --num-chunks $CHUNKS \
-  --chunk-idx $IDX \
+  --num_chunks $CHUNKS \
+  --chunk_idx $IDX \
   --temperature 0 \
-  --conv-mode vicuna_v1
+  --conv_mode vicuna_v1
