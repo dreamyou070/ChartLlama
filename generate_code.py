@@ -226,7 +226,8 @@ def eval_model(args):
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
     print(f' (1.1.2) base model with lora')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
-    # lora_cfg
+    print(f' - lora_cfg_pretrained = {lora_cfg_pretrained}')
+    # config has vision head, but there is no vision head pretrained in model base ...
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
     model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                   low_cpu_mem_usage=True,
@@ -234,9 +235,13 @@ def eval_model(args):
                                                   **kwargs)
     print(f' (1.1.3) tokenizer')
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features
+    # lm_head in features = token_dim
+    # lm_head out features = token_num
+    print(f' - token_num = {token_num}, token_dim = {token_dim}')
+    # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
-        model.lm_head.weight = torch.nn.Parameter(
-            torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
+        model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
+                                                              device=model.device, dtype=model.dtype))
         model.model.embed_tokens.weight = torch.nn.Parameter(
             torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
 
