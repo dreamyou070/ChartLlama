@@ -319,7 +319,7 @@ def eval_model(args):
         stop_str = conv_templates[args.conv_mode].sep if conv_templates[
                                                              args.conv_mode].sep_style != SeparatorStyle.TWO else \
         conv_templates[args.conv_mode].sep2
-        input_ids = input_ids.to(device='cuda', non_blocking=True)
+        input_ids = input_ids.to(device=device, non_blocking=True)
 
         with torch.inference_mode():
             output_ids = model.generate(input_ids,
