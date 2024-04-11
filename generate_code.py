@@ -303,16 +303,23 @@ def eval_model(args):
     data_loader = create_data_loader(questions, args.image_folder, tokenizer, image_processor, model.config)
     device = model.device
     print(f'\n step 3. Inference')
+    # conv (conv_vicuna_v1) =
+    # Conversation(system="A chat between a curious user and an artificial intelligence assistant.
+    # The assistant gives helpful, detailed, and polite answers to the user's questions.",
+    # roles=('USER', 'ASSISTANT'), messages=[], offset=0, sep_style=<SeparatorStyle.TWO: 2>,
+    # sep=' ', sep2='</s>', version='v1', skip_next=False)
+
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["id"]
-        cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
-        print(f'cur_prompt = {cur_prompt}')
-        stop_str = conv_templates[args.conv_mode].sep if conv_templates[args.conv_mode].sep_style != SeparatorStyle.TWO else \
-        print(f' stop_str = {stop_str}')
-        conv_templates[args.conv_mode].sep2
 
-        input_ids = input_ids.to(device=device, non_blocking=True)
-        print(f' input_ids = {input_ids}')
+        # [1] instruction
+        idx = line["id"]
+        cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
+
+        stop_str = conv_templates[args.conv_mode].sep if conv_templates[
+                                                             args.conv_mode].sep_style != SeparatorStyle.TWO else \
+        conv_templates[args.conv_mode].sep2
+        input_ids = input_ids.to(device='cuda', non_blocking=True)
 
         with torch.inference_mode():
             output_ids = model.generate(input_ids,
