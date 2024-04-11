@@ -30,7 +30,8 @@ class LlavaMetaModel:
         super(LlavaMetaModel, self).__init__(config)
 
         if hasattr(config, "mm_vision_tower"):
-            self.vision_tower = build_vision_tower(config, delay_load=True)
+            self.vision_tower = build_vision_tower(config,
+                                                   delay_load=True)
             self.mm_projector = build_vision_projector(config)
 
     def get_vision_tower(self):
@@ -90,8 +91,7 @@ class LlavaMetaForCausalLM(ABC):
         return image_features
 
     def prepare_inputs_labels_for_multimodal(
-        self, input_ids, attention_mask, past_key_values, labels, images
-    ):
+        self, input_ids, attention_mask, past_key_values, labels, images):
         vision_tower = self.get_vision_tower()
         if vision_tower is None or images is None or input_ids.shape[1] == 1:
             if past_key_values is not None and vision_tower is not None and images is not None and input_ids.shape[1] == 1:

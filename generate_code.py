@@ -7,7 +7,7 @@ import shortuuid
 import warnings
 import shutil
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, BitsAndBytesConfig
-from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
+from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN, DEFAULT_IMAGE_PATCH_TOKEN
 from llava.conversation import conv_templates, SeparatorStyle
 # from llava.model.builder import load_pretrained_model
 from llava.model import *
@@ -57,7 +57,7 @@ def load_pretrained_model(model_path, model_base,
                                                       config=lora_cfg_pretrained,
                                                       **kwargs)
         token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
-        if model.lm_head.weight.shape[0] != token_num:
+        if model.lm_head.weight.shape[0] != token_num: # should be same to use pretrained model
             model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
             model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
 
@@ -87,16 +87,16 @@ def load_pretrained_model(model_path, model_base,
     print(f' [4] tokenizer agumenting with patch token')
     image_processor = None
     mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)
+    if mm_use_im_start_end:
+        tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
     mm_use_im_patch_token = getattr(model.config, "mm_use_im_patch_token", True)
     if mm_use_im_patch_token:
         tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
-    if mm_use_im_start_end:
-        tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
     model.resize_token_embeddings(len(tokenizer))
 
     print(f' [5] vision model')
     vision_tower = model.get_vision_tower()
-    if not vision_tower.is_loaded:
+    if not vision_tower.is_loaded : # how it is ...?
         vision_tower.load_model()
     # what is device ?
     vision_tower.to(device=model.device, dtype=torch.float16)
@@ -219,14 +219,19 @@ def eval_model(args):
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)  # model_path = "listen2you002/ChartLlama-13b"
     model_name = get_model_name_from_path(model_path) #
-    model_base = args.model_base
+
     print(f' (1.1) Llava model')
+
     print(f' (1.1.1) tokenizer')
-    tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_base, use_fast=False)
+
     print(f' (1.1.2) base model with lora (no vision head trained param yet)')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
-    model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
+    model = LlavaLlamaForCausalLM.from_pretrained(args.model_base,
+                                                  low_cpu_mem_usage=True,
+                                                  config=lora_cfg_pretrained,
+                                                  **kwargs)
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
@@ -252,10 +257,6 @@ def eval_model(args):
     model.load_state_dict(non_lora_trainables, strict=False)
 
     print(f' (1.1.4) loading lora weights and merging')
-    # --------------------------------------------------------------------------------------------------------------
-    # parameter efficient (Here problem ...)
-    #model = PeftModel.from_pretrained(model, model_path)
-    #model = model.merge_and_unload()
 
     print(f' (1.1.5) image token use or not (control tokenizer token size) ')
     image_processor = None
@@ -271,8 +272,9 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    #vision_tower.to(device=model.device, dtype=model.dtype)
-    vision_tower.to(device=kwargs['device_map'], dtype=kwargs['torch_dtype'])
+    vision_tower.to(device=model.device, dtype=torch.float32)
+
+
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?

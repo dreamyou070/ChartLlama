@@ -32,19 +32,23 @@ class LlavaConfig(LlamaConfig):
 
 
 class LlavaLlamaModel(LlavaMetaModel, LlamaModel):
+
     config_class = LlavaConfig
 
     def __init__(self, config: LlamaConfig):
         super(LlavaLlamaModel, self).__init__(config)
 
 
-class LlavaLlamaForCausalLM(LlamaForCausalLM, LlavaMetaForCausalLM):
+class LlavaLlamaForCausalLM(LlamaForCausalLM,
+                            LlavaMetaForCausalLM):
 
     config_class = LlavaConfig
 
     def __init__(self, config):
+
         super(LlamaForCausalLM, self).__init__(config)
-        self.model = LlavaLlamaModel(config)
+
+        self.model = LlavaLlamaModel(config) # llavametamodel, llamamodel
 
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
@@ -88,12 +92,11 @@ class LlavaLlamaForCausalLM(LlamaForCausalLM, LlavaMetaForCausalLM):
             use_cache=use_cache,
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
-            return_dict=return_dict
-        )
-
+            return_dict=return_dict)
         hidden_states = outputs[0]
         logits = self.lm_head(hidden_states)
 
+        """ next token prediction loss """
         loss = None
         if labels is not None:
             # Shift so that tokens < n predict n
@@ -106,18 +109,14 @@ class LlavaLlamaForCausalLM(LlamaForCausalLM, LlavaMetaForCausalLM):
             # Enable model/pipeline parallelism
             shift_labels = shift_labels.to(shift_logits.device)
             loss = loss_fct(shift_logits, shift_labels)
-
         if not return_dict:
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
-
-        return CausalLMOutputWithPast(
-            loss=loss,
-            logits=logits,
-            past_key_values=outputs.past_key_values,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+        return CausalLMOutputWithPast(loss=loss,
+                                      logits=logits,
+                                      past_key_values=outputs.past_key_values,
+                                      hidden_states=outputs.hidden_states,
+                                      attentions=outputs.attentions,)
 
     def prepare_inputs_for_generation(
         self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, **kwargs

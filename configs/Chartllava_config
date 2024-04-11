@@ -1,7 +1,5 @@
  "_name_or_path": "listen2you002/ChartLlama-13b",
-  "architectures": [
-    "LlavaLlamaForCausalLM"
-  ],
+  "architectures": ["LlavaLlamaForCausalLM"],
   "bos_token_id": 1,
   "eos_token_id": 2,
   "freeze_mm_mlp_adapter": false,
