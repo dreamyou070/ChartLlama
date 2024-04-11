@@ -258,6 +258,9 @@ def eval_model(args):
     model.load_state_dict(non_lora_trainables, strict=False)
     model.to(device=model.device, dtype=model.dtype)
 
+    dtype = model.dtype
+    print(f' - dtype = {dtype}')
+
     print(f' (1.1.4) loading lora weights and merging')
     # parameter efficient
     #model = PeftModel.from_pretrained(model, model_path)
@@ -280,6 +283,9 @@ def eval_model(args):
         vision_tower.load_model()
     vision_tower.to(device=model.device, dtype=model.dtype)
     image_processor = vision_tower.image_processor
+    # ------------------------------------------------------------------------------
+    # image processor to device and dtype ... ?
+    image_processor.to(device=model.device, dtype=model.dtype)
     if hasattr(model.config, "max_sequence_length"): # if model.config
         context_len = model.config.max_sequence_length
     else: # context_len = 2048
