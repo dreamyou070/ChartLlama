@@ -11,7 +11,7 @@ vision_tower="openai/clip-vit-large-patch14-336"
 # head ...  ?
 mm_projector_type="mlp2x_gelu"
 
-CUDA_VISIBLE_DEVICES=1 \
+CUDA_VISIBLE_DEVICES=0 \
   python generate_code.py \
   --model_base "lmsys/vicuna-13b-v1.5" \
   --model_path "listen2you002/ChartLlama-13b" \
