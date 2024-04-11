@@ -256,7 +256,6 @@ def eval_model(args):
     # parameter efficient (Here problem ...)
     #model = PeftModel.from_pretrained(model, model_path)
     #model = model.merge_and_unload()
-    #print('Model is loaded...')
 
     print(f' (1.1.5) image token use or not (control tokenizer token size) ')
     image_processor = None
@@ -273,7 +272,7 @@ def eval_model(args):
     if not vision_tower.is_loaded:
         vision_tower.load_model()
     #vision_tower.to(device=model.device, dtype=model.dtype)
-    vision_tower.to(**kwargs)
+    vision_tower.to(device=kwargs['device_map'], dtype=kwargs['torch_dtype'])
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?
