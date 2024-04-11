@@ -258,13 +258,11 @@ def eval_model(args):
     model.load_state_dict(non_lora_trainables, strict=False)
     model.to(device=model.device, dtype=model.dtype)
 
-    dtype = model.dtype
-    print(f' - dtype = {dtype}')
-
+    dtype = model.dtype # torch.float16
     print(f' (1.1.4) loading lora weights and merging')
     # parameter efficient
-    #model = PeftModel.from_pretrained(model, model_path)
-    #model = model.merge_and_unload()
+    model = PeftModel.from_pretrained(model, model_path)
+    model = model.merge_and_unload()
     #print('Model is loaded...')
 
     print(f' (1.1.5) image token use or not (control tokenizer token size) ')
@@ -285,7 +283,6 @@ def eval_model(args):
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?
-    image_processor.to(device=model.device, dtype=model.dtype)
     if hasattr(model.config, "max_sequence_length"): # if model.config
         context_len = model.config.max_sequence_length
     else: # context_len = 2048
