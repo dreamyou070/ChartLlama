@@ -253,9 +253,9 @@ def eval_model(args):
 
     print(f' (1.1.4) loading lora weights and merging')
     # --------------------------------------------------------------------------------------------------------------
-    # parameter efficient
-    model = PeftModel.from_pretrained(model, model_path)
-    model = model.merge_and_unload()
+    # parameter efficient (Here problem ...)
+    #model = PeftModel.from_pretrained(model, model_path)
+    #model = model.merge_and_unload()
     #print('Model is loaded...')
 
     print(f' (1.1.5) image token use or not (control tokenizer token size) ')
@@ -272,7 +272,8 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    vision_tower.to(device=model.device, dtype=model.dtype)
+    #vision_tower.to(device=model.device, dtype=model.dtype)
+    vision_tower.to(**kwargs)
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?
@@ -289,7 +290,6 @@ def eval_model(args):
         elem = questions[i:i + chunk_size]
         total_questions.append(elem)
     #print(f' - total_questions = {total_questions}')
-
     #answers_file = os.path.expanduser(args.answers_file)
     #dir_name = os.path.dirname(answers_file)
     #print(f' - dir_name = {dir_name}')
@@ -309,21 +309,17 @@ def eval_model(args):
     # sep=' ', sep2='</s>', version='v1', skip_next=False)
 
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
-        idx = line["id"]
 
         # [1] instruction
         idx = line["id"]
         cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
 
-        stop_str = conv_templates[args.conv_mode].sep if conv_templates[
-                                                             args.conv_mode].sep_style != SeparatorStyle.TWO else \
+        stop_str = conv_templates[args.conv_mode].sep if conv_templates[args.conv_mode].sep_style != SeparatorStyle.TWO else \
         conv_templates[args.conv_mode].sep2
-        input_ids = input_ids.to(device = model.device,
-                                 dtype = model.dtype,
-                                 non_blocking=True)
+        input_ids = input_ids.to(device = model.device, dtype = model.dtype, non_blocking=True)
 
         with torch.inference_mode():
-            model.to(device=device, dtype=model.dtype)
+            # model.to(device=device, dtype=model.dtype)
             # model.generate ->
             output_ids = model.generate(input_ids.type(torch.long),
                                         images=image_tensor.to(dtype=model.dtype,
