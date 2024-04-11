@@ -15,8 +15,8 @@ deepspeed train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --model_name_or_path "${model_name_or_path}" \
     --version $PROMPT_VERSION \
-    --data_path data/vistext/L2L3_captions_simplified.json \
-    --image_folder data/vistext \
+    --data_path data/vistext/data_train_simplified.json \
+    --image_folder data/vistext/sy \
     --vision_tower openai/clip-vit-large-patch14 \
     --tune_mm_mlp_adapter True \
     --mm_vision_select_layer -2 \
@@ -43,4 +43,3 @@ deepspeed train_mem.py \
     --dataloader_num_workers 4 \
     --lazy_preprocess True \
     --report_to wandb
-    
