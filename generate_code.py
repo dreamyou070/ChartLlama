@@ -332,6 +332,9 @@ def eval_model(args):
 
         with torch.inference_mode():
             model.to(device=device, dtype=model.dtype)
+
+            # model.generate ->
+
             output_ids = model.generate(input_ids,
                                         images=image_tensor.to(dtype=model.dtype,
                                                                device=device,
