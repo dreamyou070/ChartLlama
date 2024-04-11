@@ -289,9 +289,11 @@ def eval_model(args):
     for i in range(0, len(questions), chunk_size) :
         elem = questions[i:i + chunk_size]
         total_questions.append(elem)
-    print(f' - total_questions = {total_questions}')
+    #print(f' - total_questions = {total_questions}')
 
     answers_file = os.path.expanduser(args.answers_file)
+    dir_name = os.path.dirname(answers_file)
+    print(f' - dir_name = {dir_name}')
     os.makedirs(os.path.dirname(answers_file), exist_ok=True)
     ans_file = open(answers_file, "w")
     if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
