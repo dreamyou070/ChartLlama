@@ -219,30 +219,20 @@ def eval_model(args):
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)  # model_path = "listen2you002/ChartLlama-13b"
     model_name = get_model_name_from_path(model_path) #
-    print(f' (1.0) device')
     model_base = args.model_base
-
     print(f' (1.1) Llava model')
     print(f' (1.1.1) tokenizer')
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
     print(f' (1.1.2) base model with lora (no vision head trained param yet)')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
-    model = LlavaLlamaForCausalLM.from_pretrained(model_base,
-                                                  low_cpu_mem_usage=True,
-                                                  config=lora_cfg_pretrained,
-                                                  **kwargs) # kwargs = {'device_map': 'auto', 'torch_dtype': torch.float32}
-
+    model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
-        model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
-                                                              device=model.device,
-                                                              dtype=model.dtype))
-        model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
-                                                                         device=model.device,
-                                                                         dtype=model.dtype))
-    print(f' (1.1.3) lora vision tower (2x MLP)')
+        model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
+        model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
+    print(f' (1.1.3) lora vision tower (2xMLP)')
     if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
         non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
     else:
@@ -256,14 +246,11 @@ def eval_model(args):
     # model.model.mm_projector.0.bias
     # model.model.mm_projector.2.weight
     # model.model.mm_projector.2.bias
-    non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in
-                           non_lora_trainables.items()}
+    non_lora_trainables = {(k[11:] if k.startswith('base_model.') else k): v for k, v in non_lora_trainables.items()}
     if any(k.startswith('model.model.') for k in non_lora_trainables):
         non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
     model.load_state_dict(non_lora_trainables, strict=False)
-    model.to(device=model.device, dtype=model.dtype)
 
-    dtype = model.dtype # torch.float16
     print(f' (1.1.4) loading lora weights and merging')
     # --------------------------------------------------------------------------------------------------------------
     # parameter efficient
@@ -285,8 +272,7 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    vision_tower.to(device=model.device,
-                    dtype=model.dtype)
+    vision_tower.to(device=model.device, dtype=model.dtype)
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?
