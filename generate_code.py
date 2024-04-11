@@ -199,6 +199,8 @@ def find_all_linear_names(model):
 
 def eval_model(args):
 
+    dtype = torch.float32 # original = torch.float16
+
     print(f'\n step 1. model')
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)  # model_path = "listen2you002/ChartLlama-13b"
@@ -219,7 +221,7 @@ def eval_model(args):
                                                            bnb_4bit_use_double_quant=True,
                                                            bnb_4bit_quant_type='nf4')
     else:
-        kwargs['torch_dtype'] = torch.float16
+        kwargs['torch_dtype'] = dtype
 
     print(f' (1.1) Llava model')
     print(f' (1.1.1) tokenizer')
@@ -229,14 +231,17 @@ def eval_model(args):
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
     model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                   low_cpu_mem_usage=True,
-                                                  config=lora_cfg_pretrained, **kwargs)
+                                                  config=lora_cfg_pretrained,
+                                                  **kwargs) # kwargs = {'device_map': 'auto', 'torch_dtype': torch.float16}
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
         model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
-                                                              device=model.device, dtype=model.dtype))
+                                                              device=model.device,
+                                                              dtype=model.dtype))
         model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, token_dim,
-                                                                         device=model.device, dtype=model.dtype))
+                                                                         device=model.device,
+                                                                         dtype=model.dtype))
     print(f' (1.1.3) lora vision tower (2x MLP)')
     if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
         non_lora_trainables = torch.load(os.path.join(model_path, 'non_lora_trainables.bin'), map_location='cpu')
@@ -280,7 +285,8 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    vision_tower.to(device=model.device, dtype=model.dtype)
+    vision_tower.to(device=model.device,
+                    dtype=model.dtype)
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?
@@ -332,9 +338,7 @@ def eval_model(args):
 
         with torch.inference_mode():
             model.to(device=device, dtype=model.dtype)
-
             # model.generate ->
-
             output_ids = model.generate(input_ids,
                                         images=image_tensor.to(dtype=model.dtype,
                                                                device=device,
@@ -345,6 +349,7 @@ def eval_model(args):
                                         num_beams=args.num_beams,
                                         max_new_tokens=1636,
                                         use_cache=True)
+
         print(f' model output = {output_ids}')
         input_token_len = input_ids.shape[1]
         n_diff_input_output = (input_ids != output_ids[:, :input_token_len]).sum().item()
