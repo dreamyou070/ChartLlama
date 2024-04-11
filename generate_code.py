@@ -227,7 +227,9 @@ def eval_model(args):
     print(f' (1.1.2) base model with lora (no vision head trained param yet)')
     lora_cfg_pretrained = AutoConfig.from_pretrained(model_path)  # LlavaConfig
     lora_cfg_pretrained.mm_vision_tower = args.vision_tower
-    model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
+    model = LlavaLlamaForCausalLM.from_pretrained(model_base,
+                                                  low_cpu_mem_usage=True,
+                                                  config=lora_cfg_pretrained, **kwargs)
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
@@ -254,6 +256,7 @@ def eval_model(args):
     if any(k.startswith('model.model.') for k in non_lora_trainables):
         non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
     model.load_state_dict(non_lora_trainables, strict=False)
+    model.to(device=model.device, dtype=model.dtype)
 
     print(f' (1.1.4) loading lora weights and merging')
     # parameter efficient
@@ -275,7 +278,7 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    vision_tower.to(device=model.device) #, dtype=torch.float16)
+    vision_tower.to(device=model.device, dtype=model.dtype)
     image_processor = vision_tower.image_processor
     if hasattr(model.config, "max_sequence_length"): # if model.config
         context_len = model.config.max_sequence_length
@@ -319,11 +322,15 @@ def eval_model(args):
         stop_str = conv_templates[args.conv_mode].sep if conv_templates[
                                                              args.conv_mode].sep_style != SeparatorStyle.TWO else \
         conv_templates[args.conv_mode].sep2
-        input_ids = input_ids.to(device=device, non_blocking=True)
+        input_ids = input_ids.to(device = model.device,
+                                 dtype = model.dtype,
+                                 non_blocking=True)
 
         with torch.inference_mode():
             output_ids = model.generate(input_ids,
-                                        images=image_tensor.to(dtype=torch.float16, device=device, non_blocking=True),
+                                        images=image_tensor.to(dtype=model.dtype,
+                                                               device=device,
+                                                               non_blocking=True),
                                         do_sample=True if args.temperature > 0 else False,
                                         temperature=args.temperature,
                                         top_p=args.top_p,
