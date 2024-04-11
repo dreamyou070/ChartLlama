@@ -133,39 +133,22 @@ class CustomDataset(Dataset):
     def __getitem__(self, index):
 
         # [1] get one line
+        # input_ids = [img_token][text_token] / [img_token][text_token] / [img_token][text_token] / ...
         line = self.questions[index]
-
-        # [2] get image file
-        image_file = line["image"] # image_path
-
-        # [3] human asking
-        # DEFAULT_IMAGE_TOKEN = <image> --> What is the title of the chart?
-        # DEFAULT_IM_START_TOKEN + (DEFAULT_IMAGE_TOKEN) + DEFAULT_IM_END_TOKEN
         qs = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
         if self.model_config.mm_use_im_start_end:
             qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + qs
         else:
             qs = DEFAULT_IMAGE_TOKEN + '\n' + qs
+        conv = conv_templates[args.conv_mode].copy()  # conv_mode = vicuna_v1 -> conv_vicuna_v1
+        conv.append_message(conv.roles[0], qs)  # conv.roles[0] = USER
+        conv.append_message(conv.roles[1], None)  # conv.roles[1] =  ASSISTANT
+        input_ids = tokenizer_image_token(conv.get_prompt(), self.tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt')
 
-        # conv_mode = vicuna_v1 -> conv_vicuna_v1
-        conv = conv_templates[args.conv_mode].copy()
-        print(f'conv (conv_vicuna_v1) = {conv}')
-        # conv.roles[0] = USER
-        # conv.roles[1] =  ASSISTANT
-        conv.append_message(conv.roles[0], qs)
-        conv.append_message(conv.roles[1], None) # no answer
-
-        # [5] input image
+        # [2] get image file
+        image_file = line["image"] # image_path
         image = Image.open(os.path.join(self.image_folder, image_file)).convert('RGB')
         image_tensor = process_images([image], self.image_processor, self.model_config)[0]
-
-        # [4] get prompt
-        prompt = conv.get_prompt()
-        print(f'prompt = {prompt}')
-        input_ids = tokenizer_image_token(prompt,
-                                          self.tokenizer,
-                                          IMAGE_TOKEN_INDEX,
-                                          return_tensors='pt')
 
         return input_ids, image_tensor
 
@@ -174,10 +157,13 @@ class CustomDataset(Dataset):
 
 
 # DataLoader
-def create_data_loader(questions, image_folder, tokenizer, image_processor, model_config, batch_size=1, num_workers=4):
+def create_data_loader(questions, image_folder, tokenizer, image_processor, model_config, batch_size=1, num_workers=1):
     assert batch_size == 1, "batch_size must be 1"
     dataset = CustomDataset(questions, image_folder, tokenizer, image_processor, model_config)
-    data_loader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False)
+    data_loader = DataLoader(dataset,
+                             batch_size=batch_size,
+                             num_workers=num_workers,
+                             shuffle=False)
     return data_loader
 
 def find_all_linear_names(model):
@@ -233,7 +219,6 @@ def eval_model(args):
                                                   config=lora_cfg_pretrained,
                                                   **kwargs)
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
-    # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
         model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
         model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, token_dim, device=model.device, dtype=model.dtype))
@@ -256,8 +241,6 @@ def eval_model(args):
         non_lora_trainables = {(k[6:] if k.startswith('model.') else k): v for k, v in non_lora_trainables.items()}
     model.load_state_dict(non_lora_trainables, strict=False)
 
-    print(f' (1.1.4) loading lora weights and merging')
-
     print(f' (1.1.5) image token use or not (control tokenizer token size) ')
     image_processor = None
     mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)    # false (default = False)
@@ -274,7 +257,6 @@ def eval_model(args):
         vision_tower.load_model()
     vision_tower.to(device=model.device, dtype=torch.float32)
 
-
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------
     # image processor to device and dtype ... ?
@@ -290,18 +272,13 @@ def eval_model(args):
     for i in range(0, len(questions), chunk_size) :
         elem = questions[i:i + chunk_size]
         total_questions.append(elem)
-    #print(f' - total_questions = {total_questions}')
-    #answers_file = os.path.expanduser(args.answers_file)
-    #dir_name = os.path.dirname(answers_file)
-    #print(f' - dir_name = {dir_name}')
-    #os.makedirs(answers_file), exist_ok=True)
     ans_file = open(args.answers_file, "w")
     if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
         args.conv_mode = args.conv_mode + '_mmtag'
         print(f'this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
-
     data_loader = create_data_loader(questions, args.image_folder, tokenizer, image_processor, model.config)
     device = model.device
+
     print(f'\n step 3. Inference')
     # conv (conv_vicuna_v1) =
     # Conversation(system="A chat between a curious user and an artificial intelligence assistant.
@@ -311,21 +288,19 @@ def eval_model(args):
 
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
 
-        # [1] instruction
+        # [1] index number
         idx = line["id"]
+        # [2] instruction (DEFAULT_IMAGE_TOKEN="<image>")
         cur_prompt = line["conversations"][0]['value'].replace(DEFAULT_IMAGE_TOKEN, '').strip()
+        # [3] stop string ?
+        stop_str = conv_templates[args.conv_mode].sep if conv_templates[args.conv_mode].sep_style != SeparatorStyle.TWO else conv_templates[args.conv_mode].sep2
 
-        stop_str = conv_templates[args.conv_mode].sep if conv_templates[args.conv_mode].sep_style != SeparatorStyle.TWO else \
-        conv_templates[args.conv_mode].sep2
+        # [4] input_ids ( [img_token][text_token] / [img_token][text_token] / ... )
         input_ids = input_ids.to(device = model.device, dtype = model.dtype, non_blocking=True)
 
         with torch.inference_mode():
-            # model.to(device=device, dtype=model.dtype)
-            # model.generate ->
-            output_ids = model.generate(input_ids.type(torch.long),
-                                        images=image_tensor.to(dtype=model.dtype,
-                                                               device=device,
-                                                               non_blocking=True),
+            output_ids = model.generate(input_ids.type(torch.long), # [4] input_ids ( [img_token][text_token] / [img_token][text_token] / ... )
+                                        images=image_tensor.to(dtype=model.dtype, device=device, non_blocking=True),
                                         do_sample=True if args.temperature > 0 else False,
                                         temperature=args.temperature,
                                         top_p=args.top_p,

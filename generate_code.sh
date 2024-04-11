@@ -8,7 +8,6 @@ question_file="data/vistext/vistext_qa.json"
 image_folder="data/vistext"
 answers_file="data/vistext/sy_answer.json"
 vision_tower="openai/clip-vit-large-patch14-336"
-# head ...  ?
 mm_projector_type="mlp2x_gelu"
 
 CUDA_VISIBLE_DEVICES=0 \
