@@ -260,6 +260,7 @@ def eval_model(args):
 
     dtype = model.dtype # torch.float16
     print(f' (1.1.4) loading lora weights and merging')
+    # --------------------------------------------------------------------------------------------------------------
     # parameter efficient
     model = PeftModel.from_pretrained(model, model_path)
     model = model.merge_and_unload()
@@ -330,6 +331,7 @@ def eval_model(args):
                                  non_blocking=True)
 
         with torch.inference_mode():
+            model.to(device=device, dtype=model.dtype)
             output_ids = model.generate(input_ids,
                                         images=image_tensor.to(dtype=model.dtype,
                                                                device=device,
