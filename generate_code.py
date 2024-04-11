@@ -198,7 +198,18 @@ def find_all_linear_names(model):
 
 
 def eval_model(args):
+    
+    print(f'\n step 1. model')
+    disable_torch_init()
+    model_path = os.path.expanduser(args.model_path)
+    model_name = get_model_name_from_path(model_path)
+    # model_name ? vicuna-13b-v1.5
+    # model_path =
+    tokenizer, model, image_processor, context_len = load_pretrained_model(model_path,
+                                                                           args.model_base,
+                                                                           model_name)
 
+    """
     print(f'\n step 1. model')
     disable_torch_init()
     model_path = os.path.expanduser(args.model_path)  # model_path = "listen2you002/ChartLlama-13b"
@@ -281,7 +292,7 @@ def eval_model(args):
         context_len = model.config.max_sequence_length
     else: # context_len = 2048
         context_len = 2048
-
+    """
     print(f'\n step 2. code generating instruction files')
     questions = json.load(open(os.path.expanduser(args.question_file), 'r'))
     total_questions = []
