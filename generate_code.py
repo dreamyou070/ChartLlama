@@ -186,7 +186,7 @@ def find_all_linear_names(model):
 def eval_model(args):
 
     print(f'\n step 0. basic setting')
-    dtype = torch.float32 # original = torch.float16
+    dtype = torch.float16 # original = torch.float16
     load_8bit = False
     load_4bit = False
     kwargs = {"device_map": 'auto'}
@@ -255,7 +255,7 @@ def eval_model(args):
     vision_tower = model.get_vision_tower() # vision_tower.is_loaded = False
     if not vision_tower.is_loaded:
         vision_tower.load_model()
-    vision_tower.to(device=model.device, dtype=torch.float32)
+    vision_tower.to(device=model.device, dtype=dtype)
 
     image_processor = vision_tower.image_processor
     # ------------------------------------------------------------------------------

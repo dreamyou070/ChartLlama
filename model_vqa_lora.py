@@ -17,6 +17,7 @@ from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 import math
 
+
 def load_pretrained_model(model_path, model_base,
                           model_name, load_8bit=False, load_4bit=False,
                           device_map="auto", device="cuda"):
