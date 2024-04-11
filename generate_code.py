@@ -199,7 +199,9 @@ def find_all_linear_names(model):
 
 def eval_model(args):
 
+    print(f'\n step 0. basic setting')
     dtype = torch.float32 # original = torch.float16
+    device = args.device
 
     print(f'\n step 1. model')
     disable_torch_init()
@@ -207,7 +209,7 @@ def eval_model(args):
     model_name = get_model_name_from_path(model_path) #
     print(f' (1.0) device')
     model_base = args.model_base
-    device = "cuda"
+
     device_map = "auto"
     load_8bit = False
     load_4bit = False
@@ -233,6 +235,7 @@ def eval_model(args):
                                                   low_cpu_mem_usage=True,
                                                   config=lora_cfg_pretrained,
                                                   **kwargs) # kwargs = {'device_map': 'auto', 'torch_dtype': torch.float16}
+    model.to(device=device, dtype=dtype)
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
@@ -387,5 +390,6 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
+    parser.add_argument("--device", default = 'cuda:0')
     args = parser.parse_args()
     eval_model(args)
