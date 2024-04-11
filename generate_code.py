@@ -201,7 +201,6 @@ def eval_model(args):
 
     print(f'\n step 0. basic setting')
     dtype = torch.float32 # original = torch.float16
-    device = args.device
 
     print(f'\n step 1. model')
     disable_torch_init()
@@ -210,10 +209,10 @@ def eval_model(args):
     print(f' (1.0) device')
     model_base = args.model_base
 
-    device_map = "auto"
+
     load_8bit = False
     load_4bit = False
-    kwargs = {"device_map": device_map}
+    kwargs = {"device_map": 'auto'}
     if load_8bit:
         kwargs['load_in_8bit'] = True
     elif load_4bit:
@@ -234,8 +233,8 @@ def eval_model(args):
     model = LlavaLlamaForCausalLM.from_pretrained(model_base,
                                                   low_cpu_mem_usage=True,
                                                   config=lora_cfg_pretrained,
-                                                  **kwargs) # kwargs = {'device_map': 'auto', 'torch_dtype': torch.float16}
-    model.to(device=device, dtype=dtype)
+                                                  **kwargs) # kwargs = {'device_map': 'auto', 'torch_dtype': torch.float32}
+
     token_num, token_dim = model.lm_head.out_features, model.lm_head.in_features # token_num = 32000, token_dim = 5120
     # model.lm_head.weight.shape = [token_num, token_dim]
     if model.lm_head.weight.shape[0] != token_num:
