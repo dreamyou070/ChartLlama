@@ -301,7 +301,7 @@ def eval_model(args):
         print(f'this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
 
     data_loader = create_data_loader(questions, args.image_folder, tokenizer, image_processor, model.config)
-
+    device = model.device
     print(f'\n step 3. Inference')
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["id"]
@@ -310,7 +310,7 @@ def eval_model(args):
         stop_str = conv_templates[args.conv_mode].sep if conv_templates[
                                                              args.conv_mode].sep_style != SeparatorStyle.TWO else \
         conv_templates[args.conv_mode].sep2
-        input_ids = input_ids.to(device='cuda', non_blocking=True)
+        input_ids = input_ids.to(device=device, non_blocking=True)
 
         with torch.inference_mode():
             output_ids = model.generate(
