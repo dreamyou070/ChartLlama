@@ -18,7 +18,7 @@ CUDA_VISIBLE_DEVICES=1 \
   --vision_tower "${vision_tower}" \
   --question_file "${question_file}" \
   --image_folder "${image_folder}" \
-  --answers_file "${answers_fil}" \
+  --answers_file "${answers_file}" \
   --num_chunks $CHUNKS \
   --chunk_idx $IDX \
   --temperature 0 \
